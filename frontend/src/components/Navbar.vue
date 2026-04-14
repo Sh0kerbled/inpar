@@ -6,6 +6,15 @@ import { onClickOutside } from "@vueuse/core";
 
 const { t, locale } = useI18n();
 
+const setLang = (code) => {
+  locale.value = code;
+
+  localStorage.setItem("user-locale", code);
+
+  document.documentElement.setAttribute("lang", code);
+
+  isLangOpen.value = false;
+};
 const languages = [
   { code: "en", label: "ENG" },
   { code: "ru", label: "RU" },
@@ -25,11 +34,6 @@ const currentLangLabel = computed(() => {
 onClickOutside(langDropdownRef, () => {
   isLangOpen.value = false;
 });
-
-const setLang = (code) => {
-  locale.value = code;
-  isLangOpen.value = false;
-};
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;

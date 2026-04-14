@@ -1,32 +1,36 @@
 <script setup>
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { Building2, Cog, Ruler, Zap } from "lucide-vue-next";
 
-const services = [
+const { t } = useI18n();
+
+const services = computed(() => [
   {
     icon: Building2,
-    title: "Infrastructure",
-    description: "Advanced structural engineering and technical planning",
+    title: t("services.items.infrastructure.title"),
+    description: t("services.items.infrastructure.desc"),
     color: "#B8A276",
   },
   {
     icon: Cog,
-    title: "Systems Integration",
-    description: "Complex multi-system coordination and optimization",
+    title: t("services.items.integration.title"),
+    description: t("services.items.integration.desc"),
     color: "#A8ADB5",
   },
   {
     icon: Ruler,
-    title: "Precision Design",
-    description: "High-tolerance technical documentation and specification",
+    title: t("services.items.design.title"),
+    description: t("services.items.design.desc"),
     color: "#B8A276",
   },
   {
     icon: Zap,
-    title: "Performance",
-    description: "Real-time monitoring and efficiency optimization",
+    title: t("services.items.performance.title"),
+    description: t("services.items.performance.desc"),
     color: "#3B82F6",
   },
-];
+]);
 </script>
 
 <template>
@@ -40,17 +44,19 @@ const services = [
       >
         <div class="flex items-center gap-4 mb-4">
           <div class="h-px w-8 bg-[#B8A276]" />
-          <span class="text-[#B8A276] text-sm tracking-[0.15em] uppercase"
-            >Core Services</span
-          >
+          <span class="text-[#B8A276] text-sm tracking-[0.15em] uppercase">
+            {{ t("services.badge") }}
+          </span>
         </div>
-        <h2 class="text-5xl font-light tracking-tight">Capabilities</h2>
+        <h2 class="text-5xl font-light tracking-tight">
+          {{ t("services.title") }}
+        </h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="(service, index) in services"
-          :key="service.title"
+          :key="index"
           v-motion
           :initial="{ opacity: 0, y: 40 }"
           :visibleOnce="{
@@ -64,10 +70,6 @@ const services = [
             class="relative h-full p-8 border border-[#333842] backdrop-blur-sm bg-gradient-to-br from-[#1A1D23]/40 to-[#252932]/20 transition-all duration-500 group-hover:border-[#3B82F6]/50"
           >
             <div
-              class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            />
-
-            <div
               class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               :style="{ boxShadow: `inset 0 0 60px ${service.color}15` }"
             />
@@ -79,7 +81,9 @@ const services = [
                 :style="{ color: service.color }"
                 :stroke-width="1.5"
               />
-              <h3 class="text-xl mb-3 font-normal tracking-tight">
+              <h3
+                class="text-xl mb-3 font-normal tracking-tight text-[#E8E9ED]"
+              >
                 {{ service.title }}
               </h3>
               <p class="text-[#9BA1AB] text-sm leading-relaxed font-light">

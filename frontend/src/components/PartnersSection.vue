@@ -1,17 +1,20 @@
 <script setup>
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+
 const partners = [
-  "TECHCORP",
-  "VERTEX",
-  "AXIOM",
-  "STELLAR",
-  "QUANTUM",
-  "NEXUS",
-  "TITAN",
-  "ZENITH",
-  "PULSE",
-  "APEX",
-  "PRIME",
-  "CORE",
+  "ОBТPA",
+  "ZKACCESS",
+  "ONV",
+  "GVS K-BUS",
+  "EUCHIPS",
+  "UniPOS",
+  "TeleTek",
+  "MDT Tech",
+  "DE Acoustics",
+  "Haiwvision",
+  "DAKCO",
+  "HONEYWELL",
 ];
 </script>
 
@@ -29,12 +32,14 @@ const partners = [
       >
         <div class="inline-flex items-center gap-4 mb-4">
           <div class="h-px w-8 bg-[#A8ADB5]" />
-          <span class="text-[#A8ADB5] text-sm tracking-[0.15em] uppercase"
-            >Trusted By</span
-          >
+          <span class="text-[#A8ADB5] text-sm tracking-[0.15em] uppercase">
+            {{ t("partners.badge") }}
+          </span>
           <div class="h-px w-8 bg-[#A8ADB5]" />
         </div>
-        <h2 class="text-4xl font-light tracking-tight">Industry Partners</h2>
+        <h2 class="text-4xl font-light tracking-tight">
+          {{ t("partners.title") }}
+        </h2>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">

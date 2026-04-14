@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useWindowScroll } from "@vueuse/core";
+
 import ImageWithFallback from "./ImageWithFallback.vue";
 
 const { y } = useWindowScroll();
@@ -41,8 +42,9 @@ const heroOpacity = computed(() => Math.max(1 - y.value / 500, 0));
           <div class="inline-flex items-center gap-3 mb-8">
             <span
               class="text-[#B8A276] text-sm tracking-[0.2em] uppercase font-light"
-              >Engineering Excellence</span
             >
+              {{ $t("hero.badge") }}
+            </span>
             <div
               class="h-px w-12 bg-gradient-to-r from-[#B8A276] to-transparent"
             />
@@ -51,7 +53,7 @@ const heroOpacity = computed(() => Math.max(1 - y.value / 500, 0));
           <h1
             class="text-7xl lg:text-8xl font-light tracking-tight mb-6 leading-[0.95]"
           >
-            <span class="block text-[#E8E9ED]">INPAR</span>
+            <span class="block text-[#E8E9ED]">{{ $t("hero.title") }}</span>
           </h1>
         </div>
 
@@ -65,8 +67,7 @@ const heroOpacity = computed(() => Math.max(1 - y.value / 500, 0));
           }"
           class="text-xl lg:text-2xl text-[#9BA1AB] mb-10 max-w-2xl font-light leading-relaxed"
         >
-          Precision-engineered infrastructure solutions for complex technical
-          environments.
+          {{ $t("hero.description") }}
         </p>
 
         <div
@@ -81,13 +82,11 @@ const heroOpacity = computed(() => Math.max(1 - y.value / 500, 0));
           <button
             class="group relative px-8 py-4 bg-transparent border border-[#333842] text-[#E8E9ED] overflow-hidden transition-all duration-300 hover:border-[#3B82F6]"
           >
-            <span class="relative z-10 tracking-wide">Explore Projects</span>
+            <span class="relative z-10 tracking-wide">
+              {{ $t("hero.button") }}
+            </span>
             <div
               class="absolute inset-0 bg-gradient-to-r from-[#3B82F6]/0 via-[#3B82F6]/10 to-[#3B82F6]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
-            />
-            <div
-              class="absolute inset-0 border border-[#3B82F6]/0 group-hover:border-[#3B82F6]/50 transition-colors duration-300"
-              style="box-shadow: 0 0 20px rgba(59, 130, 246, 0)"
             />
           </button>
         </div>

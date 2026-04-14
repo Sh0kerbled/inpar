@@ -1,10 +1,14 @@
 <script setup>
-const stats = [
-  { label: "Projects Delivered", value: "450+", unit: "" },
-  { label: "Countries", value: "23", unit: "" },
-  { label: "Technical Staff", value: "180", unit: "" },
-  { label: "Uptime Guarantee", value: "99.9", unit: "%" },
-];
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+
+const stats = computed(() => [
+  { label: t("about.stats.projects"), value: "450+", unit: "" },
+  { label: t("about.stats.countries"), value: "23", unit: "" },
+  { label: t("about.stats.staff"), value: "180", unit: "" },
+  { label: t("about.stats.uptime"), value: "99.9", unit: "%" },
+]);
 </script>
 
 <template>
@@ -21,16 +25,15 @@ const stats = [
         >
           <div class="flex items-center gap-4 mb-6">
             <div class="h-px w-8 bg-[#A8ADB5]" />
-            <span class="text-[#A8ADB5] text-sm tracking-[0.15em] uppercase"
-              >About INPAR</span
-            >
+            <span class="text-[#A8ADB5] text-sm tracking-[0.15em] uppercase">
+              {{ $t("about.badge") }}
+            </span>
           </div>
           <h2 class="text-5xl font-light tracking-tight mb-6">
-            Engineering at Scale
+            {{ $t("about.title") }}
           </h2>
           <p class="text-[#9BA1AB] text-lg leading-relaxed font-light mb-8">
-            Delivering mission-critical infrastructure with uncompromising
-            precision across industrial, commercial, and public sectors.
+            {{ $t("about.description") }}
           </p>
         </div>
 
