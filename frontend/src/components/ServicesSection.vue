@@ -1,36 +1,66 @@
 <script setup>
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
-import { Building2, Cog, Ruler, Zap } from "lucide-vue-next";
+import {
+  Building2,
+  ShieldAlert,
+  Cctv,
+  Network,
+  Speaker,
+  Home,
+  Combine,
+} from "lucide-vue-next";
 
-const { t } = useI18n();
-
-const services = computed(() => [
+// Если нужно, добавьте переводы для этих строк в i18n
+const services = [
   {
     icon: Building2,
-    title: t("services.items.infrastructure.title"),
-    description: t("services.items.infrastructure.desc"),
+    title: "BMS Диспетчеризация",
+    description:
+      "Комплексное управление зданием. Интеграция систем в общую платформу с единым веб-интерфейсом для снижения энергозатрат.",
     color: "#B8A276",
   },
   {
-    icon: Cog,
-    title: t("services.items.integration.title"),
-    description: t("services.items.integration.desc"),
+    icon: ShieldAlert,
+    title: "Пожарная безопасность",
+    description:
+      "Интеллектуальные адресные пожарные панели и системы аварийного оповещения (PA) для объектов любого масштаба.",
+    color: "#D00000",
+  },
+  {
+    icon: Cctv,
+    title: "Видеонаблюдение и СКУД",
+    description:
+      "NVR-системы, IP-биометрия и контроль доступа. Управление авторизованным доступом с интеграцией в пожарную сеть.",
     color: "#A8ADB5",
   },
   {
-    icon: Ruler,
-    title: t("services.items.design.title"),
-    description: t("services.items.design.desc"),
+    icon: Home,
+    title: "Умный дом (KNX/EIB)",
+    description:
+      "Проектирование и интеграция домашней автоматизации. Полный контроль освещения, климата и мультимедиа.",
+    color: "#3B82F6",
+  },
+  {
+    icon: Speaker,
+    title: "Профессиональный звук и свет",
+    description:
+      "High-End акустика, линейные массивы, робот-освещение и LED-экраны для концертов, конференц-залов и коммерции.",
     color: "#B8A276",
   },
   {
-    icon: Zap,
-    title: t("services.items.performance.title"),
-    description: t("services.items.performance.desc"),
+    icon: Network,
+    title: "Информационные сети и SMATV",
+    description:
+      "Проектирование сетевой инфраструктуры, IP-телефония и системы спутникового телевидения с контролем доступа к каналам.",
+    color: "#A8ADB5",
+  },
+  {
+    icon: Combine,
+    title: "Системная интеграция",
+    description:
+      "Бесшовная интеграция оборудования различных производителей. Настройка, симуляция программ и техподдержка.",
     color: "#3B82F6",
   },
-]);
+];
 </script>
 
 <template>
@@ -44,19 +74,17 @@ const services = computed(() => [
       >
         <div class="flex items-center gap-4 mb-4">
           <div class="h-px w-8 bg-[#B8A276]" />
-          <span class="text-[#B8A276] text-sm tracking-[0.15em] uppercase">
-            {{ t("services.badge") }}
-          </span>
+          <span class="text-[#B8A276] text-sm tracking-[0.15em] uppercase"
+            >Core Services</span
+          >
         </div>
-        <h2 class="text-5xl font-light tracking-tight">
-          {{ t("services.title") }}
-        </h2>
+        <h2 class="text-5xl font-light tracking-tight">Сферы деятельности</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="(service, index) in services"
-          :key="index"
+          :key="service.title"
           v-motion
           :initial="{ opacity: 0, y: 40 }"
           :visibleOnce="{
@@ -69,6 +97,10 @@ const services = computed(() => [
           <div
             class="relative h-full p-8 border border-[#333842] backdrop-blur-sm bg-gradient-to-br from-[#1A1D23]/40 to-[#252932]/20 transition-all duration-500 group-hover:border-[#3B82F6]/50"
           >
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            />
+
             <div
               class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               :style="{ boxShadow: `inset 0 0 60px ${service.color}15` }"
