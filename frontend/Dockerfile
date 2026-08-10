@@ -1,4 +1,4 @@
-# Stage 1: Build
+# Stage 1: Build (expects node_modules to be pre-built locally)
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -6,14 +6,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with retry logic and network config
-RUN npm config set registry https://registry.npmjs.org/ && \
-    npm config set fetch-timeout 120000 && \
-    npm config set fetch-retry-mintimeout 10000 && \
-    npm config set fetch-retry-maxtimeout 120000 && \
-    npm config set fetch-retries 3 && \
-    npm cache clean --force && \
-    npm install --legacy-peer-deps --prefer-offline --no-audit --progress=false
+# Try to copy pre-built node_modules, if not available npm will install
+RUN if [ -d "node_modules" ]; then echo "Using local node_modules"; else npm cache clean --force && npm install --legacy-peer-deps --prefer-offline --no-audit --progress=false; fi
 
 # Copy source code  
 COPY . .
