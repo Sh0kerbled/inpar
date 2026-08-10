@@ -20,7 +20,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
-  
+
   // Всегда отправляем токен, если он есть, особенно для POST/PATCH/DELETE
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -29,7 +29,7 @@ api.interceptors.request.use((config) => {
       delete config.headers["Content-Type"];
     }
   }
-  
+
   return config;
 });
 

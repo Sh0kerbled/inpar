@@ -63,7 +63,7 @@ export const useAuthStore = defineStore("auth", () => {
     if (stored) {
       user.value = JSON.parse(stored);
     }
-    
+
     const token = localStorage.getItem("access_token");
     if (token) {
       // Если токен существует в localStorage, убедись что он есть в API headers
