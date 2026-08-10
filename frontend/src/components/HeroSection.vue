@@ -1,23 +1,24 @@
 <script setup>
 import { computed } from "vue";
 import { useWindowScroll } from "@vueuse/core";
-
 import ImageWithFallback from "./ImageWithFallback.vue";
+import { useRouter } from "vue-router";
 
 const { y } = useWindowScroll();
-
 const heroImageY = computed(() => `${y.value * 0.1}px`);
 const heroOpacity = computed(() => Math.max(1 - y.value / 500, 0));
+
+const router = useRouter();
 </script>
 
 <template>
   <section class="relative h-screen flex items-center overflow-hidden pt-20">
     <div
-      class="absolute inset-0 bg-gradient-to-br from-[#1A1D23] via-[#1A1D23]/95 to-[#252932]/80 z-10"
+      class="absolute inset-0 bg-gradient-to-br from-[#1A1D23] via-[#1A1D23]/95 to-[#252932]/80 z-10 pointer-events-none"
     />
 
     <div
-      class="absolute inset-0 z-0"
+      class="absolute inset-0 z-0 pointer-events-none"
       :style="{ transform: `translateY(${heroImageY})`, opacity: heroOpacity }"
     >
       <ImageWithFallback
@@ -78,9 +79,11 @@ const heroOpacity = computed(() => Math.max(1 - y.value / 500, 0));
             y: 0,
             transition: { duration: 800, delay: 600 },
           }"
+          class="relative z-30"
         >
           <button
-            class="group relative px-8 py-4 bg-transparent border border-[#333842] text-[#E8E9ED] overflow-hidden transition-all duration-300 hover:border-[#3B82F6]"
+            @click="router.push('/projects')"
+            class="group relative inline-flex items-center px-8 py-4 bg-transparent border border-[#333842] text-[#E8E9ED] overflow-hidden transition-all duration-300 hover:border-[#3B82F6]"
           >
             <span class="relative z-10 tracking-wide">
               {{ $t("hero.button") }}
@@ -94,7 +97,7 @@ const heroOpacity = computed(() => Math.max(1 - y.value / 500, 0));
     </div>
 
     <div
-      class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#333842] to-transparent z-20"
+      class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#333842] to-transparent z-20 pointer-events-none"
     />
   </section>
 </template>

@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+
 const { t } = useI18n();
 
 const stats = computed(() => [
@@ -25,24 +26,18 @@ const stats = computed(() => [
         >
           <div class="flex items-center gap-4 mb-6">
             <div class="h-px w-8 bg-[#A8ADB5]" />
-            <span class="text-[#A8ADB5] text-sm tracking-[0.15em] uppercase"
-              >Intelligent Partner</span
-            >
+            <span class="text-[#A8ADB5] text-sm tracking-[0.15em] uppercase">
+              {{ t("about.badge") }}
+            </span>
           </div>
           <h2 class="text-5xl font-light tracking-tight mb-6">
-            Интеллектуальная автоматизация
+            {{ t("about.title") }}
           </h2>
           <p class="text-[#9BA1AB] text-lg leading-relaxed font-light mb-6">
-            Основанная в 2014 году в Алматы, компания
-            <b>INPAR.KZ</b> специализируется на внедрении слаботочных систем,
-            автоматизации зданий (BMS) и технологий «Умный дом» стандарта
-            KNX/EIB.
+            {{ t("about.description1") }}
           </p>
           <p class="text-[#9BA1AB] text-lg leading-relaxed font-light mb-8">
-            Мы берем на себя полный цикл: от акустического и системного
-            проектирования до программирования и постгарантийного обслуживания.
-            Наша цель — создание энергоэффективных, безопасных и легко
-            управляемых пространств с единым интерфейсом.
+            {{ t("about.description2") }}
           </p>
         </div>
 
@@ -67,8 +62,9 @@ const stats = computed(() => [
             <div class="text-4xl font-light mb-2 tracking-tight">
               <span
                 class="text-[#E8E9ED] group-hover:text-[#3B82F6] transition-colors duration-300"
-                >{{ stat.value }}</span
               >
+                {{ stat.value }}
+              </span>
               <span class="text-[#B8A276] text-2xl ml-1">{{ stat.unit }}</span>
             </div>
             <div class="text-[#9BA1AB] text-sm tracking-wide uppercase">

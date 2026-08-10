@@ -35,11 +35,35 @@ import aktobemega from "./img/image 14.svg";
 import kcell from "./img/image 15.svg";
 import qyzylordacenter from "./img/image 16.svg";
 import bnplaza from "./img/image 17.svg";
+import narxoz from "./img/image 18.svg";
+import orhun from "./img/image 19.svg";
+import burabay from "./img/image 20.svg";
+import astanamotors from "./img/image 21.svg";
 import Navbar from "@/components/Navbar.vue";
 
 const { t } = useI18n();
 
 const activeFilter = ref("all");
+
+const getLocationKey = (location) => {
+  const locationMap = {
+    Алматы: "almaty",
+    Астана: "astana",
+    Екатеринбург: "ekaterinburg",
+    "Триполи, Ливия": "tripoli",
+    Шымкент: "shymkent",
+    Туркестан: "turkestan",
+    Актобе: "aktobe",
+    Қызылорда: "qyzylorda",
+    Бурабай: "boroboe",
+  };
+  return locationMap[location] || location;
+};
+
+const getTranslatedLocation = (location) => {
+  const key = getLocationKey(location);
+  return t(`projects.cities.${key}`);
+};
 
 const filters = computed(() => [
   { key: "all", label: t("projects.filters.all") },
@@ -244,8 +268,7 @@ const projects = [
     name: "NARXOZ University",
     location: "Алматы",
     type: "public",
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80",
+    image: narxoz,
     systems: ["audio", "conference", "lighting"],
   },
   {
@@ -253,8 +276,7 @@ const projects = [
     name: "Almaty Orhun Medical Center",
     location: "Алматы",
     type: "public",
-    image:
-      "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&q=80",
+    image: orhun,
     systems: ["fire", "audio", "access", "network", "cctv"],
   },
   {
@@ -262,8 +284,7 @@ const projects = [
     name: "Boroboe Golf Club VIP Villa",
     location: "Бурабай",
     type: "residential",
-    image:
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80",
+    image: burabay,
     systems: ["fire", "cctv", "network", "smart", "hvac"],
   },
   {
@@ -298,8 +319,7 @@ const projects = [
     name: "Shymkent Astana Motors",
     location: "Шымкент",
     type: "office",
-    image:
-      "https://images.unsplash.com/photo-1550355291-bbee04a92027?w=800&q=80",
+    image: astanamotors,
     systems: ["cctv", "access", "security", "audio"],
   },
 ];
@@ -349,7 +369,6 @@ const filteredProjects = computed(() =>
           </div>
         </div>
 
-        <!-- Filters -->
         <div class="flex flex-wrap gap-2 mb-12">
           <button
             v-for="filter in filters"
@@ -366,7 +385,6 @@ const filteredProjects = computed(() =>
           </button>
         </div>
 
-        <!-- Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Transition
             v-for="(project, index) in filteredProjects"
@@ -380,73 +398,74 @@ const filteredProjects = computed(() =>
                 opacity: 1,
                 y: 0,
                 scale: 1,
-                transition: { duration: 500, delay: (index % 9) * 50, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+                transition: {
+                  duration: 500,
+                  delay: (index % 9) * 50,
+                  easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+                },
               }"
               class="group relative flex flex-col border border-[#333842] bg-gradient-to-br from-[#1A1D23]/60 to-[#252932]/30 overflow-hidden transition-all duration-500 hover:border-[#B8A276]/40"
             >
-            <!-- Image -->
-            <div class="relative h-52 overflow-hidden">
-              <img
-                :src="project.image"
-                :alt="project.name"
-                loading="lazy"
-                width="800"
-                height="450"
-                class="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700"
-              />
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-[#1A1D23] via-[#1A1D23]/30 to-transparent pointer-events-none"
-              />
-              <div class="absolute top-4 left-4">
-                <span
-                  class="inline-flex items-center px-3 py-1 bg-[#1A1D23]/80 border border-[#333842] text-[#A8ADB5] text-xs tracking-wide uppercase backdrop-blur-sm"
-                >
-                  {{ project.location }}
-                </span>
-              </div>
-              <div v-if="project.area" class="absolute top-4 right-4">
-                <span
-                  class="inline-flex items-center px-3 py-1 bg-[#B8A276]/15 border border-[#B8A276]/30 text-[#B8A276] text-xs"
-                >
-                  {{ project.area }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Info -->
-            <div class="flex flex-col flex-1 p-6">
-              <h3
-                class="text-lg font-normal tracking-tight text-[#E8E9ED] mb-4 leading-snug group-hover:text-white transition-colors duration-300"
-              >
-                {{ project.name }}
-              </h3>
-              <div class="flex flex-wrap gap-2 mt-auto">
+              <div class="relative h-52 overflow-hidden">
+                <img
+                  :src="project.image"
+                  :alt="project.name"
+                  loading="lazy"
+                  width="800"
+                  height="450"
+                  class="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700"
+                />
                 <div
-                  v-for="sysKey in project.systems"
-                  :key="sysKey"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 border border-[#333842] bg-[#252932]/60"
-                >
-                  <component
-                    :is="systemIcons[sysKey]?.icon"
-                    class="w-3 h-3 flex-shrink-0"
-                    :style="{ color: systemIcons[sysKey]?.color }"
-                    :stroke-width="2"
-                  />
-                  <span class="text-[#9BA1AB] text-xs font-light">
-                    {{ systemIcons[sysKey]?.label }}
+                  class="absolute inset-0 bg-gradient-to-t from-[#1A1D23] via-[#1A1D23]/30 to-transparent pointer-events-none"
+                />
+                <div class="absolute top-4 left-4">
+                  <span
+                    class="inline-flex items-center px-3 py-1 bg-[#1A1D23]/80 border border-[#333842] text-[#A8ADB5] text-xs tracking-wide uppercase backdrop-blur-sm"
+                  >
+                    {{ getTranslatedLocation(project.location) }}
+                  </span>
+                </div>
+                <div v-if="project.area" class="absolute top-4 right-4">
+                  <span
+                    class="inline-flex items-center px-3 py-1 bg-[#B8A276]/15 border border-[#B8A276]/30 text-[#B8A276] text-xs"
+                  >
+                    {{ project.area }}
                   </span>
                 </div>
               </div>
-            </div>
 
-            <div
-              class="absolute top-0 right-0 w-16 h-16 border-t border-r border-transparent group-hover:border-[#B8A276]/30 transition-colors duration-500 pointer-events-none"
-            />
+              <div class="flex flex-col flex-1 p-6">
+                <h3
+                  class="text-lg font-normal tracking-tight text-[#E8E9ED] mb-4 leading-snug group-hover:text-white transition-colors duration-300"
+                >
+                  {{ project.name }}
+                </h3>
+                <div class="flex flex-wrap gap-2 mt-auto">
+                  <div
+                    v-for="sysKey in project.systems"
+                    :key="sysKey"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 border border-[#333842] bg-[#252932]/60"
+                  >
+                    <component
+                      :is="systemIcons[sysKey]?.icon"
+                      class="w-3 h-3 flex-shrink-0"
+                      :style="{ color: systemIcons[sysKey]?.color }"
+                      :stroke-width="2"
+                    />
+                    <span class="text-[#9BA1AB] text-xs font-light">
+                      {{ systemIcons[sysKey]?.label }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="absolute top-0 right-0 w-16 h-16 border-t border-r border-transparent group-hover:border-[#B8A276]/30 transition-colors duration-500 pointer-events-none"
+              />
             </div>
           </Transition>
         </div>
 
-        <!-- Empty -->
         <div
           v-if="filteredProjects.length === 0"
           class="flex flex-col items-center justify-center py-24 text-[#9BA1AB]"

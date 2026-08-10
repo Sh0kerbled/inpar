@@ -1,50 +1,106 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n();
 const mapContainer = ref(null);
 let dgMap = null;
 let marker = null;
+let mapInitialized = false;
 
-const initMap = () => {
-  if (window.DG) {
-    window.DG.then(() => {
-      dgMap = window.DG.map(mapContainer.value, {
-        center: [43.233071, 76.852412],
-        zoom: 16,
-        scrollWheelZoom: false,
-        fullscreenControl: false,
-      });
-
-      marker = window.DG.marker([43.233071, 76.852412])
-        .addTo(dgMap)
-        .bindPopup(getPopupContent());
-    });
-  }
-};
+const companyCoords = [43.233071, 76.852412];
 
 const getPopupContent = () => {
-  return `<div style="color: #1A1D23; font-family: Inter, sans-serif;">
-    <b>INPAR.KZ</b><br/>${t("contact.address")}
-  </div>`;
+  return `
+    <div style="
+      color: #1A1D23; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 10px;
+      text-align: center;
+    ">
+      <div style="font-weight: 600; color: #ffffff; font-size: 13px;">INPAR.KZ</div>
+    </div>
+  `;
+};
+
+const initMap = () => {
+  if (!mapContainer.value) return;
+
+  try {
+    window.DG.then(function () {
+      if (!mapInitialized && mapContainer.value) {
+        const isMobile = window.innerWidth < 768;
+        const zoom = isMobile ? 15 : 16;
+
+        dgMap = window.DG.map(mapContainer.value, {
+          center: companyCoords,
+          zoom: zoom,
+          scrollWheelZoom: false,
+          fullscreenControl: true,
+          fullscreenControlPosition: "topright",
+          trafficControl: false,
+        });
+
+        marker = window.DG.marker(companyCoords, {
+          title: "INPAR.KZ Office",
+        })
+          .addTo(dgMap)
+          .bindPopup(getPopupContent(), {
+            closeButton: true,
+            maxWidth: 280,
+          })
+          .openPopup();
+
+        marker.on("click", function () {
+          marker.openPopup();
+        });
+
+        mapInitialized = true;
+      }
+    });
+  } catch (error) {
+    console.error("Error initializing 2GIS map:", error);
+  }
 };
 
 watch(locale, () => {
-  if (marker) {
+  if (marker && mapInitialized) {
     marker.setPopupContent(getPopupContent());
+    marker.openPopup();
   }
 });
 
+const handleResize = () => {
+  if (dgMap && mapContainer.value) {
+    dgMap.invalidateSize();
+  }
+};
+
 onMounted(() => {
-  if (!document.getElementById("2gis-loader")) {
+  if (!window.DG && !document.getElementById("2gis-loader")) {
     const script = document.createElement("script");
     script.id = "2gis-loader";
     script.src = "https://maps.api.2gis.ru/2.0/loader.js?pkg=full";
+    script.async = true;
     script.onload = initMap;
+    script.onerror = () => {
+      console.error("Failed to load 2GIS API");
+    };
     document.head.appendChild(script);
-  } else {
-    initMap();
+  } else if (window.DG) {
+    setTimeout(initMap, 100);
+  }
+
+  window.addEventListener("resize", handleResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+  if (dgMap) {
+    dgMap.off();
+    dgMap = null;
+    marker = null;
+    mapInitialized = false;
   }
 });
 </script>
@@ -145,11 +201,11 @@ onMounted(() => {
           v-motion
           :initial="{ opacity: 0, x: 40 }"
           :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 800 } }"
-          class="relative h-[400px] border border-[#333842] bg-[#1A1D23]/60 overflow-hidden group p-2"
+          class="relative h-[500px] md:h-[400px] border border-[#333842] bg-[#1A1D23]/60 overflow-hidden group rounded"
         >
-          <div ref="mapContainer" class="w-full h-full relative z-10"></div>
+          <div ref="mapContainer" class="w-full h-full" />
           <div
-            class="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/5 to-[#B8A276]/5 pointer-events-none z-20"
+            class="absolute inset-0 bg-linear-to-br from-[#3B82F6]/5 to-[#B8A276]/5 pointer-events-none z-20"
           />
         </div>
       </div>

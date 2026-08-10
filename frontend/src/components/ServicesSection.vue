@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import {
   Building2,
   ShieldAlert,
@@ -9,58 +11,27 @@ import {
   Combine,
 } from "lucide-vue-next";
 
-// Если нужно, добавьте переводы для этих строк в i18n
-const services = [
-  {
-    icon: Building2,
-    title: "BMS Диспетчеризация",
-    description:
-      "Комплексное управление зданием. Интеграция систем в общую платформу с единым веб-интерфейсом для снижения энергозатрат.",
-    color: "#B8A276",
-  },
-  {
-    icon: ShieldAlert,
-    title: "Пожарная безопасность",
-    description:
-      "Интеллектуальные адресные пожарные панели и системы аварийного оповещения (PA) для объектов любого масштаба.",
-    color: "#D00000",
-  },
-  {
-    icon: Cctv,
-    title: "Видеонаблюдение и СКУД",
-    description:
-      "NVR-системы, IP-биометрия и контроль доступа. Управление авторизованным доступом с интеграцией в пожарную сеть.",
-    color: "#A8ADB5",
-  },
-  {
-    icon: Home,
-    title: "Умный дом (KNX/EIB)",
-    description:
-      "Проектирование и интеграция домашней автоматизации. Полный контроль освещения, климата и мультимедиа.",
-    color: "#3B82F6",
-  },
-  {
-    icon: Speaker,
-    title: "Профессиональный звук и свет",
-    description:
-      "High-End акустика, линейные массивы, робот-освещение и LED-экраны для концертов, конференц-залов и коммерции.",
-    color: "#B8A276",
-  },
-  {
-    icon: Network,
-    title: "Информационные сети и SMATV",
-    description:
-      "Проектирование сетевой инфраструктуры, IP-телефония и системы спутникового телевидения с контролем доступа к каналам.",
-    color: "#A8ADB5",
-  },
-  {
-    icon: Combine,
-    title: "Системная интеграция",
-    description:
-      "Бесшовная интеграция оборудования различных производителей. Настройка, симуляция программ и техподдержка.",
-    color: "#3B82F6",
-  },
+const { t } = useI18n();
+
+const icons = [Building2, ShieldAlert, Cctv, Home, Speaker, Network, Combine];
+const colors = [
+  "#B8A276",
+  "#D00000",
+  "#A8ADB5",
+  "#3B82F6",
+  "#B8A276",
+  "#A8ADB5",
+  "#3B82F6",
 ];
+
+const services = computed(() =>
+  Array.from({ length: 7 }, (_, i) => ({
+    icon: icons[i],
+    color: colors[i],
+    title: t(`services.serviceItems[${i}].title`),
+    description: t(`services.serviceItems[${i}].description`),
+  })),
+);
 </script>
 
 <template>
@@ -74,17 +45,19 @@ const services = [
       >
         <div class="flex items-center gap-4 mb-4">
           <div class="h-px w-8 bg-[#B8A276]" />
-          <span class="text-[#B8A276] text-sm tracking-[0.15em] uppercase"
-            >Core Services</span
-          >
+          <span class="text-[#B8A276] text-sm tracking-[0.15em] uppercase">
+            {{ t("services.badge") }}
+          </span>
         </div>
-        <h2 class="text-5xl font-light tracking-tight">Сферы деятельности</h2>
+        <h2 class="text-5xl font-light tracking-tight">
+          {{ t("services.title") }}
+        </h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="(service, index) in services"
-          :key="service.title"
+          :key="index"
           v-motion
           :initial="{ opacity: 0, y: 40 }"
           :visibleOnce="{
@@ -100,12 +73,10 @@ const services = [
             <div
               class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             />
-
             <div
               class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               :style="{ boxShadow: `inset 0 0 60px ${service.color}15` }"
             />
-
             <div class="relative z-10">
               <component
                 :is="service.icon"
@@ -122,7 +93,6 @@ const services = [
                 {{ service.description }}
               </p>
             </div>
-
             <div
               class="absolute top-0 right-0 w-16 h-16 border-t border-r border-transparent group-hover:border-[#3B82F6]/30 transition-colors duration-500"
             />
