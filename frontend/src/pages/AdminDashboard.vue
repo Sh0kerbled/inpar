@@ -12,8 +12,8 @@ const categories = ref([]);
 const exchangeRate = ref(460);
 
 const totalProducts = computed(() => productStore.products.length);
-const inStock = computed(() =>
-  productStore.products.filter((p) => p.stock_quantity > 0).length,
+const inStock = computed(
+  () => productStore.products.filter((p) => p.stock_quantity > 0).length,
 );
 const totalValueUsd = computed(() => {
   const sum = productStore.products.reduce(
@@ -24,7 +24,8 @@ const totalValueUsd = computed(() => {
 });
 const totalValueKzt = computed(() => {
   const sum = productStore.products.reduce(
-    (acc, product) => acc + parseFloat(product.price_usd || 0) * exchangeRate.value,
+    (acc, product) =>
+      acc + parseFloat(product.price_usd || 0) * exchangeRate.value,
     0,
   );
   return sum.toFixed(2);
@@ -153,9 +154,7 @@ onMounted(async () => {
           >
             Стоимость товаров
           </p>
-          <p class="text-xl font-light text-[#E8E9ED]">
-            ${{ totalValueUsd }}
-          </p>
+          <p class="text-xl font-light text-[#E8E9ED]">${{ totalValueUsd }}</p>
           <p class="text-sm text-[#B8A276] mt-2 font-light">
             ≈ {{ totalValueKzt }} ₸
           </p>

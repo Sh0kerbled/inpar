@@ -11,6 +11,7 @@ import {
   Package,
 } from "lucide-vue-next";
 import api from "../services/api";
+import { formatNiceKztPrice, calculateKztFromUsd } from "../services/price";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -33,8 +34,11 @@ const deleteProduct = async (id) => {
 };
 
 const getProductPriceKzt = (product) => {
-  if (product.price_kzt) return Number(product.price_kzt).toFixed(2);
-  return (parseFloat(product.price_usd || 0) * exchangeRate.value).toFixed(2);
+  if (!product) return "0";
+  const rawPrice = product.price_kzt
+    ? Number(product.price_kzt)
+    : calculateKztFromUsd(product.price_usd, exchangeRate.value);
+  return formatNiceKztPrice(rawPrice);
 };
 
 onMounted(async () => {

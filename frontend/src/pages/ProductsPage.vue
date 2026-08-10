@@ -1,10 +1,18 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { Search, ShoppingCart } from "lucide-vue-next";
+import {
+  Search,
+  ShoppingCart,
+  TrendingUp,
+  Package,
+  ChevronDown,
+  X,
+} from "lucide-vue-next";
 import { useProductStore } from "../stores/index";
 import Navbar from "@/components/Navbar.vue";
 import api from "../services/api";
+import { formatNiceKztFromUsd } from "../services/price";
 
 const { t } = useI18n();
 const productStore = useProductStore();
@@ -27,6 +35,13 @@ const search = async () => {
   await productStore.getProducts(params);
 };
 
+const resetFilters = async () => {
+  searchQuery.value = "";
+  selectedCategory.value = "";
+  sortBy.value = "";
+  await search();
+};
+
 onMounted(async () => {
   try {
     const rateResponse = await api.get("/exchange-rate/");
@@ -42,21 +57,32 @@ onMounted(async () => {
 const displayProducts = computed(() => productStore.products || []);
 
 const getProductPriceKzt = (product) => {
-  const usd = parseFloat(product.price_usd || 0);
-  const rate = exchangeRate.value ? parseFloat(exchangeRate.value) : 0;
-  const price = usd * rate;
-  return price ? price.toFixed(2) : "0.00";
+  if (!product) return "0";
+  return formatNiceKztFromUsd(product.price_usd, exchangeRate.value);
 };
 </script>
 
 <template>
   <Navbar />
-  <div class="min-h-screen bg-[#1A1D23] text-[#E8E9ED] py-20">
-    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+  <div
+    class="min-h-screen bg-[#1A1D23] text-[#E8E9ED] py-20 relative overflow-hidden"
+  >
+    <div
+      class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#3B82F6]/5 rounded-full blur-3xl"
+    />
+    <div
+      class="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#B8A276]/5 rounded-full blur-3xl"
+    />
+
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 relative">
       <div
         v-motion
-        :initial="{ opacity: 0, y: -20 }"
-        :enter="{ opacity: 1, y: 0, transition: { duration: 600 } }"
+        :initial="{ opacity: 0, y: -24 }"
+        :enter="{
+          opacity: 1,
+          y: 0,
+          transition: { duration: 700, ease: 'easeOut' },
+        }"
         class="mb-16 text-center"
       >
         <div class="inline-flex items-center gap-3 mb-4">
@@ -78,115 +104,162 @@ const getProductPriceKzt = (product) => {
 
       <div
         v-motion
-        :initial="{ opacity: 0, y: 20 }"
-        :enter="{ opacity: 1, y: 0, transition: { duration: 600, delay: 100 } }"
+        :initial="{ opacity: 0, y: 24 }"
+        :enter="{
+          opacity: 1,
+          y: 0,
+          transition: { duration: 700, delay: 150, ease: 'easeOut' },
+        }"
         class="mb-16"
       >
         <div
-          class="bg-[#13151A]/70 border border-[#333842] backdrop-blur-sm p-8 space-y-6"
+          class="bg-[#13151A]/80 border border-[#333842] backdrop-blur-sm rounded-2xl shadow-xl shadow-black/20 overflow-hidden"
         >
           <div
-            class="flex flex-col gap-3 p-4 rounded-3xl border border-[#3B82F6]/10 bg-[#1A1D23]/70"
+            class="flex flex-col lg:flex-row lg:items-center gap-4 p-6 border-b border-[#333842]/70"
           >
-            <p
-              class="text-xs text-[#9BA1AB] uppercase tracking-[0.25em] font-light"
+            <div
+              class="flex items-center gap-3 shrink-0 px-4 py-2.5 rounded-xl border border-[#3B82F6]/15 bg-[#1A1D23]/70"
             >
-              Курс USD → KZT
-            </p>
-            <div class="flex flex-wrap items-center gap-3">
-              <span class="text-2xl font-semibold text-[#B8A276]">
-                ₸{{ displayExchangeRate }}
-              </span>
-              <span class="text-sm text-[#9BA1AB]">за 1 USD</span>
+              <TrendingUp class="w-4 h-4 text-[#B8A276] shrink-0" />
+              <div class="flex items-baseline gap-1.5 whitespace-nowrap">
+                <span
+                  v-motion
+                  :initial="{ opacity: 0, y: -4 }"
+                  :enter="{ opacity: 1, y: 0, transition: { duration: 300 } }"
+                  :key="displayExchangeRate"
+                  class="text-base font-semibold text-[#B8A276]"
+                >
+                  ₸{{ displayExchangeRate }}
+                </span>
+                <span class="text-xs text-[#9BA1AB]">/ 1 USD</span>
+              </div>
             </div>
-          </div>
-          <div>
-            <label
-              class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
-            >
-              {{ t("catalog.search") }}
-            </label>
-            <div class="relative">
+
+            <div class="relative flex-1">
               <Search
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9BA1AB]"
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9BA1AB] pointer-events-none"
               />
               <input
                 v-model="searchQuery"
                 type="text"
                 :placeholder="t('catalog.searchPlaceholder')"
-                class="w-full pl-12 pr-4 py-3 bg-[#1A1D23]/60 border border-[#333842] text-[#E8E9ED] placeholder-[#9BA1AB]/50 focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+                class="w-full pl-12 pr-32 py-3.5 bg-[#1A1D23]/60 border border-[#333842] text-[#E8E9ED] placeholder-[#9BA1AB]/50 rounded-xl focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 transition-all duration-300 font-light text-base"
                 @keyup.enter="search"
               />
+              <button
+                @click="search"
+                class="absolute right-1.5 top-1/2 -translate-y-1/2 px-5 py-2 bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white text-sm font-medium rounded-lg transition-colors duration-200 active:scale-[0.97]"
+              >
+                {{ t("catalog.search") }}
+              </button>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label
-                class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
-              >
-                {{ t("catalog.category") }}
-              </label>
+          <div class="flex flex-wrap items-center gap-3 p-6">
+            <div class="relative group">
               <select
                 v-model="selectedCategory"
-                class="w-full px-4 py-3 bg-[#1A1D23]/60 border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light appearance-none cursor-pointer"
+                class="peer appearance-none pl-4 pr-9 py-2.5 bg-[#1A1D23]/60 border border-[#333842] text-[#E8E9ED] rounded-full focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-all duration-200 font-light text-sm cursor-pointer hover:border-[#3B82F6]/40 min-w-[170px]"
+                :class="
+                  selectedCategory ? 'border-[#B8A276]/50 text-[#B8A276]' : ''
+                "
                 @change="search"
               >
-                <option value="">{{ t("catalog.allCategories") }}</option>
-                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                <option value="" class="bg-[#1A1D23] text-[#E8E9ED]">
+                  {{ t("catalog.allCategories") }}
+                </option>
+                <option
+                  v-for="cat in categories"
+                  :key="cat.id"
+                  :value="cat.id"
+                  class="bg-[#1A1D23] text-[#E8E9ED]"
+                >
                   {{ cat.name }}
                 </option>
               </select>
+              <ChevronDown
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none transition-transform duration-200 peer-focus:rotate-180"
+                :class="selectedCategory ? 'text-[#B8A276]' : 'text-[#9BA1AB]'"
+              />
             </div>
 
-            <div>
-              <label
-                class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
-              >
-                {{ t("catalog.sorting") }}
-              </label>
+            <div class="relative group">
               <select
                 v-model="sortBy"
-                class="w-full px-4 py-3 bg-[#1A1D23]/60 border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light appearance-none cursor-pointer"
+                class="peer appearance-none pl-4 pr-9 py-2.5 bg-[#1A1D23]/60 border border-[#333842] text-[#E8E9ED] rounded-full focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-all duration-200 font-light text-sm cursor-pointer hover:border-[#3B82F6]/40 min-w-[170px]"
+                :class="sortBy ? 'border-[#B8A276]/50 text-[#B8A276]' : ''"
                 @change="search"
               >
-                <option value="">{{ t("catalog.sortDefault") }}</option>
-                <option value="price">{{ t("catalog.sortPriceAsc") }}</option>
-                <option value="-price">{{ t("catalog.sortPriceDesc") }}</option>
-                <option value="name">{{ t("catalog.sortName") }}</option>
-                <option value="-created_at">{{ t("catalog.sortNew") }}</option>
+                <option value="" class="bg-[#1A1D23] text-[#E8E9ED]">
+                  {{ t("catalog.sortDefault") }}
+                </option>
+                <option value="price" class="bg-[#1A1D23] text-[#E8E9ED]">
+                  {{ t("catalog.sortPriceAsc") }}
+                </option>
+                <option value="-price" class="bg-[#1A1D23] text-[#E8E9ED]">
+                  {{ t("catalog.sortPriceDesc") }}
+                </option>
+                <option value="name" class="bg-[#1A1D23] text-[#E8E9ED]">
+                  {{ t("catalog.sortName") }}
+                </option>
+                <option value="-created_at" class="bg-[#1A1D23] text-[#E8E9ED]">
+                  {{ t("catalog.sortNew") }}
+                </option>
               </select>
+              <ChevronDown
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none transition-transform duration-200 peer-focus:rotate-180"
+                :class="sortBy ? 'text-[#B8A276]' : 'text-[#9BA1AB]'"
+              />
             </div>
 
-            <div class="flex items-end">
-              <button
-                @click="search"
-                class="w-full group relative px-6 py-3 bg-transparent border border-[#333842] text-[#E8E9ED] overflow-hidden transition-all duration-300 hover:border-[#3B82F6] focus:outline-none font-light"
-              >
-                <div
-                  class="absolute inset-0 bg-linear-to-r from-[#3B82F6]/0 via-[#3B82F6]/10 to-[#3B82F6]/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
-                />
-                <span class="relative z-10">{{ t("catalog.search") }}</span>
-              </button>
-            </div>
+            <button
+              v-if="searchQuery || selectedCategory || sortBy"
+              v-motion
+              :initial="{ opacity: 0, scale: 0.9 }"
+              :enter="{ opacity: 1, scale: 1, transition: { duration: 200 } }"
+              @click="resetFilters"
+              class="flex items-center gap-1.5 pl-3 pr-4 py-2.5 rounded-full border border-[#333842] text-[#9BA1AB] hover:text-[#E8E9ED] hover:border-[#3B82F6]/40 text-sm font-light transition-all duration-200 ml-1"
+            >
+              <X class="w-3.5 h-3.5" />
+              {{ t("catalog.resetFilters", "Сбросить фильтры") }}
+            </button>
           </div>
         </div>
       </div>
 
       <div
         v-if="productStore.isLoading"
-        class="flex items-center justify-center py-20"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
       >
-        <div class="text-[#9BA1AB] text-center">
-          <p class="font-light">{{ t("catalog.loading") }}</p>
+        <div
+          v-for="n in 8"
+          :key="n"
+          v-motion
+          :initial="{ opacity: 0 }"
+          :enter="{ opacity: 1, transition: { duration: 400, delay: n * 40 } }"
+          class="rounded-2xl border border-[#333842] bg-[#1A1D23]/40 overflow-hidden"
+        >
+          <div class="aspect-square bg-[#252932]/60 animate-pulse" />
+          <div class="p-6 space-y-3">
+            <div class="h-4 bg-[#252932]/60 rounded animate-pulse w-3/4" />
+            <div class="h-3 bg-[#252932]/40 rounded animate-pulse w-full" />
+            <div
+              class="h-10 bg-[#252932]/40 rounded-xl animate-pulse w-2/3 mt-4"
+            />
+          </div>
         </div>
       </div>
 
       <div
         v-else-if="displayProducts.length === 0"
-        class="flex items-center justify-center py-20"
+        v-motion
+        :initial="{ opacity: 0, scale: 0.95 }"
+        :enter="{ opacity: 1, scale: 1, transition: { duration: 500 } }"
+        class="flex items-center justify-center py-24"
       >
-        <div class="text-center">
+        <div class="text-center flex flex-col items-center gap-4">
+          <Package class="w-10 h-10 text-[#9BA1AB]/40" />
           <p class="text-[#9BA1AB] font-light">{{ t("catalog.notFound") }}</p>
         </div>
       </div>
@@ -200,42 +273,49 @@ const getProductPriceKzt = (product) => {
           :key="product.id"
           :to="`/products/${product.id}`"
           v-motion
-          :initial="{ opacity: 0, y: 20 }"
+          :initial="{ opacity: 0, y: 28, scale: 0.96 }"
           :visibleOnce="{
             opacity: 1,
             y: 0,
-            transition: { duration: 400, delay: index * 50 },
+            scale: 1,
+            transition: {
+              duration: 500,
+              delay: Math.min(index * 60, 400),
+              ease: 'easeOut',
+            },
           }"
           class="group relative"
         >
           <div
-            class="h-full bg-linear-to-br from-[#1A1D23]/40 to-[#252932]/20 border border-[#333842] backdrop-blur-sm overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:border-[#3B82F6]/50 hover:shadow-2xl hover:shadow-[#3B82F6]/10"
+            class="h-full bg-linear-to-br from-[#1A1D23]/40 to-[#252932]/20 border border-[#333842] backdrop-blur-sm overflow-hidden rounded-2xl transition-all duration-500 ease-out hover:-translate-y-2 hover:scale-[1.015] hover:border-[#3B82F6]/50 hover:shadow-2xl hover:shadow-[#3B82F6]/10"
           >
             <div class="aspect-square bg-[#1A1D23]/60 overflow-hidden relative">
               <img
                 v-if="product.main_image"
                 :src="product.main_image"
                 :alt="product.name"
-                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
               <div
                 v-else
-                class="w-full h-full flex items-center justify-center text-[#9BA1AB]/50"
+                class="w-full h-full flex items-center justify-center text-[#9BA1AB]/50 transition-transform duration-500 group-hover:scale-105"
               >
                 <ShoppingCart class="w-12 h-12" />
               </div>
 
               <div
+                class="absolute inset-0 bg-linear-to-t from-[#13151A]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              />
+
+              <div
                 v-if="product.category_name"
-                class="absolute top-4 left-4 px-3 py-1 bg-[#B8A276]/20 border border-[#B8A276]/50 text-[#B8A276] text-xs font-light tracking-wider"
+                class="absolute top-4 left-4 px-3 py-1 bg-[#B8A276]/20 border border-[#B8A276]/50 text-[#B8A276] text-xs font-light tracking-wider rounded-full backdrop-blur-sm"
               >
                 {{ product.category_name }}
               </div>
             </div>
 
-            <!-- Content -->
             <div class="p-6">
-              <!-- Product Name -->
               <h3
                 class="text-lg font-light tracking-tight mb-2 text-[#E8E9ED] line-clamp-2 group-hover:text-[#B8A276] transition-colors duration-300"
               >
@@ -247,14 +327,14 @@ const getProductPriceKzt = (product) => {
               </p>
 
               <div
-                class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 backdrop-blur-sm"
+                class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 backdrop-blur-sm transition-colors duration-300 group-hover:border-[#3B82F6]/20"
               >
                 <div class="space-y-1">
-                  <!-- Основная цена в тенге -->
-                  <p class="text-2xl tracking-tight text-[#B8A276]">
+                  <p
+                    class="text-2xl tracking-tight text-[#B8A276] transition-transform duration-300 group-hover:scale-105 origin-left"
+                  >
                     ₸{{ getProductPriceKzt(product) }}
                   </p>
-                  <!-- Эквивалент в долларах снизу -->
                   <p class="text-sm font-medium text-zinc-400">
                     ${{ product.price_usd }}
                   </p>
@@ -263,13 +343,16 @@ const getProductPriceKzt = (product) => {
 
               <div
                 v-if="product.stock_quantity"
-                class="text-xs text-[#B8A276] font-light tracking-wide"
+                class="text-xs text-[#B8A276] font-light tracking-wide mt-3 flex items-center gap-1.5"
               >
+                <span
+                  class="w-1.5 h-1.5 rounded-full bg-[#B8A276] animate-pulse"
+                />
                 {{ t("catalog.inStock") }} {{ product.stock_quantity }}
               </div>
               <div
                 v-else
-                class="text-xs text-[#9BA1AB]/50 font-light tracking-wide"
+                class="text-xs text-[#9BA1AB]/50 font-light tracking-wide mt-3"
               >
                 {{ t("catalog.outOfStock") }}
               </div>

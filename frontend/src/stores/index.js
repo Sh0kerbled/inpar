@@ -24,6 +24,9 @@ export const useAuthStore = defineStore("auth", () => {
       localStorage.setItem("refresh_token", response.data.refresh);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
+      // Явно установить Authorization header для всех последующих запросов
+      api.defaults.headers.common.Authorization = `Bearer ${response.data.access}`;
+
       return true;
     } catch (error) {
       console.error("Login error:", error);
@@ -40,6 +43,8 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
+    // Удалить Authorization header при logout
+    delete api.defaults.headers.common.Authorization;
   };
 
   const getMe = async () => {
@@ -57,6 +62,13 @@ export const useAuthStore = defineStore("auth", () => {
     const stored = localStorage.getItem("user");
     if (stored) {
       user.value = JSON.parse(stored);
+    }
+    
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      // Если токен существует в localStorage, убедись что он есть в API headers
+      api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      accessToken.value = token;
     }
   };
 

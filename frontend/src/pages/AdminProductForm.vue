@@ -13,6 +13,7 @@ import {
   ChevronDown,
 } from "lucide-vue-next";
 import api from "../services/api";
+import { formatNiceKztFromUsd } from "../services/price";
 
 const router = useRouter();
 const route = useRoute();
@@ -40,7 +41,7 @@ const form = reactive({
 
 const priceKztPreview = computed(() => {
   if (!form.price_usd || form.price_usd === "") return 0;
-  return (parseFloat(form.price_usd) * exchangeRate.value).toFixed(2);
+  return formatNiceKztFromUsd(form.price_usd, exchangeRate.value);
 });
 
 const logout = () => {

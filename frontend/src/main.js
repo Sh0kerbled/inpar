@@ -136,6 +136,12 @@ const messages = {
       inStock: "✓ In stock:",
       outOfStock: "Out of stock",
       premiumQuality: "Premium quality",
+      resetFilters: "Reset filters",
+      contactWhatsapp: "Contact via WhatsApp",
+      whatsappMessage:
+        'Hello! I\'m interested in this product:\n"{name}"\nPrice: ₸{price}\n{url}',
+      backToCatalog: "Back to catalog",
+      characteristics: "Specifications",
     },
     projects: {
       badge: "Our Portfolio",
@@ -306,6 +312,12 @@ const messages = {
       inStock: "✓ В наличии:",
       outOfStock: "Нет в наличии",
       premiumQuality: "Премиум качество",
+      resetFilters: "Сбросить фильтры",
+      contactWhatsapp: "Связаться в WhatsApp",
+      whatsappMessage:
+        "Здравствуйте! Меня интересует товар:\n«{name}»\nЦена: ₸{price}\n{url}",
+      backToCatalog: "Вернуться в каталог",
+      characteristics: "Характеристики",
     },
     projects: {
       badge: "Наши объекты",
@@ -476,6 +488,12 @@ const messages = {
       inStock: "✓ Қоймада бар:",
       outOfStock: "Қоймада жоқ",
       premiumQuality: "Премиум сапа",
+      resetFilters: "Сүзгілерді тазарту",
+      contactWhatsapp: "WhatsApp арқылы хабарласу",
+      whatsappMessage:
+        "Сәлеметсіз бе! Мені мына тауар қызықтырды:\n«{name}»\nБағасы: ₸{price}\n{url}",
+      backToCatalog: "Каталогқа оралу",
+      characteristics: "Сипаттамалары",
     },
     projects: {
       badge: "Біздің объектілер",

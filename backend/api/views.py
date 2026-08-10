@@ -130,7 +130,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = Category.objects.filter(is_active=True)
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
     filterset_fields = ['is_active']
     search_fields = ['name', 'description']
 
@@ -159,14 +158,12 @@ class ProductViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'is_active']
     search_fields = ['name', 'description']
-    ordering_fields = ['price', 'name', 'created_at']
+    ordering_fields = ['price_usd', 'name', 'created_at']
     ordering = ['-created_at']
-
-    permission_classes = [AllowAny]
 
     def get_permissions(self):
         """Allow anyone to list and retrieve, but only admin can modify"""
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'search', 'price_range']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated, IsAdminUser]
@@ -183,9 +180,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         price_max = self.request.query_params.get('price_max')
 
         if price_min:
-            queryset = queryset.filter(price__gte=float(price_min))
+            queryset = queryset.filter(price_usd__gte=float(price_min))
         if price_max:
-            queryset = queryset.filter(price__lte=float(price_max))
+            queryset = queryset.filter(price_usd__lte=float(price_max))
 
         return queryset
 
@@ -197,6 +194,18 @@ class ProductViewSet(viewsets.ModelViewSet):
             return ProductDetailSerializer
         else:  # create, update, partial_update, destroy
             return ProductCreateUpdateSerializer
+    
+    def perform_create(self, serializer):
+        """Override create to ensure proper permissions"""
+        serializer.save()
+    
+    def perform_update(self, serializer):
+        """Override update to ensure proper permissions"""
+        serializer.save()
+    
+    def perform_destroy(self, instance):
+        """Override destroy to ensure proper permissions"""
+        instance.delete()
 
     @action(detail=False, methods=['get'])
     def search(self, request):
@@ -246,7 +255,6 @@ class OrderViewSet(viewsets.ModelViewSet):
     - Retrieve: anyone (but should be protected in production)
     """
     queryset = Order.objects.all()
-    permission_classes = [AllowAny]
 
     def get_permissions(self):
         """
