@@ -70,6 +70,12 @@ class ProductCreateUpdateSerializer(serializers.ModelSerializer):
             'is_active', 'main_image', 'stock_quantity', 'characteristics',
             'created_at', 'updated_at'
         ]
+    extra_kwargs = {
+        'is_active': {
+            'required': False,
+            'default': True,
+        },
+    }
 
     def create(self, validated_data):
         characteristics_data = validated_data.pop('characteristics', [])

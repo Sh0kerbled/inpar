@@ -10,7 +10,7 @@ import {
   ArrowLeft,
   Upload,
   X,
-  ChevronDown,
+  Cbdfbdgsfdsfvdfsvsdfbsdofjbosdfuhv;jofsdjbv'oiadfhevronDown,
 } from "lucide-vue-next";
 import api from "../services/api";
 import { formatNiceKztFromUsd } from "../services/price";
@@ -106,7 +106,7 @@ const handleSubmit = async () => {
     formData.append("price_usd", form.price_usd);
     formData.append("stock_quantity", form.stock_quantity);
     formData.append("category", form.category);
-    formData.append("is_active", form.is_active ? "1" : "0");
+    formData.append("is_active", String(form.is_active));
     if (imageFile.value) {
       formData.append("main_image", imageFile.value);
     }

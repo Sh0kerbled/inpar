@@ -197,7 +197,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         """Override create to ensure proper permissions"""
-        serializer.save()
+        serializer.save(is_active=True)
     
     def perform_update(self, serializer):
         """Override update to ensure proper permissions"""

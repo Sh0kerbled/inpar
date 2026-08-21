@@ -28,15 +28,15 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=True
+      - DEBUG=False
       - SECRET_KEY=dev-secret-key-change-in-production
       - DB_NAME=inpar_db
       - DB_USER=inpar_user
       - DB_PASSWORD=inpar_pass
       - DB_HOST=db
       - DB_PORT=5432
-      - ALLOWED_HOSTS=localhost,127.0.0.1
-      - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+      - ALLOWED_HOSTS=92.38.49.140,localhost,127.0.0.1
+      - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000,http://92.38.49.140,https://92.38.49.140
     depends_on:
       - db
 

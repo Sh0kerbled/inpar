@@ -94,19 +94,28 @@ export const useProductStore = defineStore("products", () => {
   const error = ref(null);
 
   const getProducts = async (params = {}) => {
-    isLoading.value = true;
-    error.value = null;
-    try {
-      const response = await api.get("/products/", { params });
-      products.value = response.data.results || response.data;
-      return products.value;
-    } catch (err) {
-      error.value = err.message;
-      return [];
-    } finally {
-      isLoading.value = false;
-    }
-  };
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const response = await api.get("/products/", { params });
+
+    console.log("PRODUCT RESPONSE:", response.status, response.data);
+
+    products.value = Array.isArray(response.data)
+      ? response.data
+      : response.data.results || [];
+
+    return products.value;
+  } catch (err) {
+    console.error("PRODUCT ERROR:", err.response?.status, err.response?.data || err);
+    error.value = err.message;
+    products.value = [];
+    return [];
+  } finally {
+    isLoading.value = false;
+  }
+};
 
   const getProduct = async (id) => {
     isLoading.value = true;

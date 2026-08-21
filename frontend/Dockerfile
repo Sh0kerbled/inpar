@@ -7,8 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Try to copy pre-built node_modules, if not available npm will install
-RUN if [ -d "node_modules" ]; then echo "Using local node_modules"; else npm cache clean --force && npm install --legacy-peer-deps --prefer-offline --no-audit --progress=false; fi
-
+RUN if [ -d "node_modules" ]; then echo "Using local node_modules"; else npm config set registry https://registry.npmmirror.com && npm config set fetch-timeout 120000 && npm install --legacy-peer-deps --prefer-offline --no-audit --progress=false; fi
 # Copy source code  
 COPY . .
 
