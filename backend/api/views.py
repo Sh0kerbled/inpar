@@ -8,12 +8,16 @@ from django.db.models import Q, Min, Max
 from django.views.decorators.csrf import csrf_exempt
 from django_filters.rest_framework import DjangoFilterBackend
 
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.http import HttpResponse
+
 from .models import Category, Product, Order
 from .serializers import (
     CategorySerializer, ProductListSerializer, ProductDetailSerializer,
     ProductCreateUpdateSerializer, OrderSerializer, OrderAdminSerializer
 )
 from .utils import get_usd_to_kzt_rate
+from .excel_service import import_products_from_excel, generate_excel_template
 
 
 @api_view(['POST'])
@@ -157,8 +161,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.filter(is_active=True).select_related('category')
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'is_active']
-    search_fields = ['name', 'description']
-    ordering_fields = ['price_usd', 'name', 'created_at']
+    search_fields = ['name', 'sku', 'description']
+    ordering_fields = ['price_usd', 'wholesale_price_usd', 'name', 'created_at', 'stock_quantity']
     ordering = ['-created_at']
 
     def get_permissions(self):
@@ -175,6 +179,12 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         if not (self.request.user and self.request.user.is_staff):
             queryset = queryset.filter(is_active=True)
+
+        category_param = self.request.query_params.get('category')
+        if category_param in ['null', 'none', 'uncategorized', 'without']:
+            queryset = queryset.filter(Q(category__isnull=True) | Q(category__name='Без категории'))
+        elif category_param:
+            queryset = queryset.filter(category_id=category_param)
 
         price_min = self.request.query_params.get('price_min')
         price_max = self.request.query_params.get('price_max')
@@ -207,6 +217,89 @@ class ProductViewSet(viewsets.ModelViewSet):
         """Override destroy to ensure proper permissions"""
         instance.delete()
 
+    @action(detail=False, methods=['post'], url_path='import-excel', parser_classes=[MultiPartParser, FormParser], permission_classes=[IsAuthenticated, IsAdminUser])
+    def import_excel(self, request):
+        """
+        Upload and import products from an Excel (.xlsx) file
+        """
+        file_obj = request.FILES.get('file')
+        if not file_obj:
+            return Response({'error': 'Файл Excel не предоставлен'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        default_category_id = request.data.get('category') or request.data.get('category_id')
+        currency = request.data.get('currency', 'KZT')
+        result = import_products_from_excel(file_obj, default_category_id=default_category_id, currency=currency)
+        
+        if not result.get('success'):
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+        return Response(result, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='clear-uncategorized', permission_classes=[IsAuthenticated, IsAdminUser])
+    def clear_uncategorized(self, request):
+        """
+        Delete all products that have no category or are in 'Без категории'
+        Useful for cleaning up erroneous test imports.
+        """
+        qs = Product.objects.filter(Q(category__isnull=True) | Q(category__name='Без категории'))
+        count = qs.count()
+        qs.delete()
+        return Response({'success': True, 'deleted': count})
+
+    @action(detail=False, methods=['post'], url_path='bulk-delete', permission_classes=[IsAuthenticated, IsAdminUser])
+    def bulk_delete(self, request):
+        """
+        Delete products by IDs list or all products
+        Body: { "ids": [1, 2, 3] } OR { "all": true }
+        """
+        delete_all = request.data.get('all', False)
+        if delete_all:
+            count = Product.objects.all().count()
+            Product.objects.all().delete()
+            return Response({'success': True, 'deleted': count})
+        
+        ids = request.data.get('ids', [])
+        if not ids:
+            return Response({'error': 'Не указаны ID товаров для удаления'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        qs = Product.objects.filter(id__in=ids)
+        count = qs.count()
+        qs.delete()
+        return Response({'success': True, 'deleted': count})
+
+    @action(detail=False, methods=['post'], url_path='bulk-set-category', permission_classes=[IsAuthenticated, IsAdminUser])
+    def bulk_set_category(self, request):
+        """
+        Assign category to multiple products at once
+        Body: { "ids": [1, 2, 3], "category_id": 5 }
+        """
+        ids = request.data.get('ids', [])
+        category_id = request.data.get('category_id')
+        
+        if not ids:
+            return Response({'error': 'Не указаны ID товаров'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        category = None
+        if category_id:
+            category = Category.objects.filter(id=category_id).first()
+            if not category:
+                return Response({'error': 'Категория не найдена'}, status=status.HTTP_404_NOT_FOUND)
+        
+        updated = Product.objects.filter(id__in=ids).update(category=category)
+        return Response({'success': True, 'updated': updated})
+
+    @action(detail=False, methods=['get'], url_path='export-template', permission_classes=[IsAuthenticated, IsAdminUser])
+    def export_template(self, request):
+        """
+        Download blank/sample Excel template for product import
+        """
+        content = generate_excel_template()
+        response = HttpResponse(
+            content,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="inpar_products_template.xlsx"'
+        return response
+
     @action(detail=False, methods=['get'])
     def search(self, request):
         """
@@ -221,7 +314,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             return Response({'results': []})
 
         results = Product.objects.filter(is_active=True).filter(
-            Q(name__icontains=query) | Q(description__icontains=query)
+            Q(name__icontains=query) | Q(sku__icontains=query) | Q(description__icontains=query)
         ).select_related('category')
 
         if category_id:
@@ -241,8 +334,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         Get min and max price for filtering
         """
         products = Product.objects.filter(is_active=True).aggregate(
-            min_price=Min('price'),
-            max_price=Max('price')
+            min_price=Min('price_usd'),
+            max_price=Max('price_usd')
         )
         return Response(products)
 

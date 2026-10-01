@@ -2,7 +2,7 @@
 import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore, useProductStore } from "../stores/index";
-import { Package, Tag, LogOut, Settings, Plus, List } from "lucide-vue-next";
+import { Package, Tag, LogOut, Settings, Plus, List, FolderTree } from "lucide-vue-next";
 import api from "../services/api";
 
 const router = useRouter();
@@ -88,6 +88,14 @@ onMounted(async () => {
         </router-link>
 
         <router-link
+          to="/admin/products?manageCategories=true"
+          class="flex items-center gap-3 px-4 py-3 text-sm text-[#9BA1AB] hover:text-[#E8E9ED] hover:bg-[#252932] transition-all duration-200 font-light"
+        >
+          <FolderTree class="w-4 h-4 text-[#B8A276]" :stroke-width="1.5" />
+          Категории
+        </router-link>
+
+        <router-link
           to="/admin/products/new"
           class="flex items-center gap-3 px-4 py-3 text-sm text-[#9BA1AB] hover:text-[#E8E9ED] hover:bg-[#252932] transition-all duration-200 font-light"
         >
@@ -138,16 +146,24 @@ onMounted(async () => {
           </p>
           <p class="text-4xl font-light text-[#3B82F6]">{{ inStock }}</p>
         </div>
-        <div class="p-6 border border-[#333842] bg-[#1A1D23]/60">
-          <p
-            class="text-xs text-[#9BA1AB] tracking-widest uppercase font-light mb-3"
-          >
-            Категорий
-          </p>
+        <router-link
+          to="/admin/products?manageCategories=true"
+          class="p-6 border border-[#333842] bg-[#1A1D23]/60 hover:border-[#B8A276]/60 transition-all block group cursor-pointer"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <p
+              class="text-xs text-[#9BA1AB] tracking-widest uppercase font-light"
+            >
+              Категорий
+            </p>
+            <span class="text-xs text-[#B8A276] opacity-60 group-hover:opacity-100 transition-opacity">
+              Редактор &rarr;
+            </span>
+          </div>
           <p class="text-4xl font-light text-[#B8A276]">
             {{ categories.length }}
           </p>
-        </div>
+        </router-link>
         <div class="p-6 border border-[#333842] bg-[#1A1D23]/60">
           <p
             class="text-xs text-[#9BA1AB] tracking-widest uppercase font-light mb-3"

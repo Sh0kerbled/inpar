@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   backend:
     build:
@@ -46,6 +46,8 @@ services:
       dockerfile: Dockerfile
     container_name: inpar_frontend
     restart: unless-stopped
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
     ports:
       - "3000:80"
     depends_on:

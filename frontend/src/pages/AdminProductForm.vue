@@ -11,6 +11,7 @@ import {
   Upload,
   X,
   ChevronDown,
+  FolderTree,
 } from "lucide-vue-next";
 import api from "../services/api";
 import { formatNiceKztFromUsd } from "../services/price";
@@ -33,15 +34,24 @@ const isEditMode = !!route.params.id;
 
 const form = reactive({
   name: "",
+  sku: "",
   description: "",
   price_usd: "",
-  stock_quantity: "",
+  wholesale_price_usd: "",
+  min_wholesale_quantity: 1,
+  stock_quantity: 0,
   category: "",
+  source_url: "",
 });
 
 const priceKztPreview = computed(() => {
   if (!form.price_usd || form.price_usd === "") return 0;
   return formatNiceKztFromUsd(form.price_usd, exchangeRate.value);
+});
+
+const wholesalePriceKztPreview = computed(() => {
+  if (!form.wholesale_price_usd || form.wholesale_price_usd === "") return null;
+  return formatNiceKztFromUsd(form.wholesale_price_usd, exchangeRate.value);
 });
 
 const logout = () => {
@@ -102,11 +112,23 @@ const handleSubmit = async () => {
   try {
     const formData = new FormData();
     formData.append("name", form.name);
-    formData.append("description", form.description);
+    formData.append("sku", form.sku || "");
+    formData.append("description", form.description || "");
     formData.append("price_usd", form.price_usd);
-    formData.append("stock_quantity", form.stock_quantity);
-    formData.append("category", form.category);
-    formData.append("is_active", form.is_active ? "1" : "0");
+    if (form.wholesale_price_usd !== "" && form.wholesale_price_usd !== null) {
+      formData.append("wholesale_price_usd", form.wholesale_price_usd);
+    }
+    if (
+      form.min_wholesale_quantity !== "" &&
+      form.min_wholesale_quantity !== null
+    ) {
+      formData.append("min_wholesale_quantity", form.min_wholesale_quantity);
+    }
+    formData.append("stock_quantity", form.stock_quantity ?? 0);
+    if (form.category) {
+      formData.append("category", form.category);
+    }
+    formData.append("source_url", form.source_url || "");
     if (imageFile.value) {
       formData.append("main_image", imageFile.value);
     }
@@ -143,10 +165,14 @@ onMounted(async () => {
     const product = await productStore.getProduct(route.params.id);
     if (product) {
       form.name = product.name;
-      form.description = product.description;
+      form.sku = product.sku || "";
+      form.description = product.description || "";
       form.price_usd = product.price_usd;
-      form.stock_quantity = product.stock_quantity;
-      form.category = product.category;
+      form.wholesale_price_usd = product.wholesale_price_usd || "";
+      form.min_wholesale_quantity = product.min_wholesale_quantity ?? 1;
+      form.stock_quantity = product.stock_quantity ?? 0;
+      form.category = product.category || "";
+      form.source_url = product.source_url || "";
       if (product.main_image) {
         imagePreview.value = product.main_image;
       }
@@ -187,6 +213,13 @@ onMounted(async () => {
         >
           <Package class="w-4 h-4" :stroke-width="1.5" />
           Товары
+        </router-link>
+        <router-link
+          to="/admin/products?manageCategories=true"
+          class="flex items-center gap-3 px-4 py-3 text-sm text-[#9BA1AB] hover:text-[#E8E9ED] hover:bg-[#252932] transition-all duration-200 font-light"
+        >
+          <FolderTree class="w-4 h-4 text-[#B8A276]" :stroke-width="1.5" />
+          Категории
         </router-link>
         <router-link
           to="/admin/products/new"
@@ -235,23 +268,37 @@ onMounted(async () => {
             {{ error }}
           </div>
 
-          <div>
-            >
-            <label
-              class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
-            >
-              Название *
-            </label>
-            <input
-              v-model="form.name"
-              type="text"
-              required
-              class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
-            />
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+              <label
+                class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
+              >
+                Название *
+              </label>
+              <input
+                v-model="form.name"
+                type="text"
+                required
+                placeholder="Например: Сенсорная панель KNX"
+                class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
+              >
+                Код / Артикул
+              </label>
+              <input
+                v-model="form.sku"
+                type="text"
+                placeholder="Например: INP-102"
+                class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+              />
+            </div>
           </div>
 
           <div>
-            >
             <label
               class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
             >
@@ -260,59 +307,124 @@ onMounted(async () => {
             <textarea
               v-model="form.description"
               rows="4"
+              placeholder="Подробное описание товара..."
               class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light resize-none"
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
-              >
-                Цена (USD) *
-              </label>
-              <input
-                v-model="form.price_usd"
-                type="number"
-                step="0.01"
-                required
-                class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
-              />
-              <p
-                v-if="priceKztPreview"
-                class="text-xs text-[#B8A276] mt-2 font-light"
-              >
-                ≈ {{ priceKztPreview }} ₸
-              </p>
+          <!-- Цены и склад -->
+          <div
+            class="border border-[#333842]/80 bg-[#13151A]/40 p-5 rounded-lg space-y-4"
+          >
+            <div
+              class="text-xs text-[#B8A276] uppercase tracking-wider font-medium"
+            >
+              Ценообразование и склад
             </div>
-            <div>
-              <label
-                class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
-              >
-                Количество *
-              </label>
-              <input
-                v-model="form.stock_quantity"
-                type="number"
-                required
-                class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
-              />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Розничная цена -->
+              <div>
+                <label
+                  class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-2 font-light"
+                >
+                  Цена в розницу (USD) *
+                </label>
+                <input
+                  v-model="form.price_usd"
+                  type="number"
+                  step="0.01"
+                  required
+                  placeholder="0.00"
+                  class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+                />
+                <p
+                  v-if="priceKztPreview"
+                  class="text-xs text-[#B8A276] mt-1.5 font-light"
+                >
+                  ≈ {{ priceKztPreview }} ₸
+                </p>
+              </div>
+
+              <!-- Общее количество на складе -->
+              <div>
+                <label
+                  class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-2 font-light"
+                >
+                  Количество на складе (всего) *
+                </label>
+                <input
+                  v-model="form.stock_quantity"
+                  type="number"
+                  min="0"
+                  required
+                  placeholder="0"
+                  class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+                />
+                <p class="text-xs text-[#9BA1AB]/70 mt-1.5 font-light">
+                  Общий остаток товара для розницы и опта
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#333842]/40"
+            >
+              <!-- Оптовая цена -->
+              <div>
+                <label
+                  class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-2 font-light"
+                >
+                  Цена оптом (USD)
+                </label>
+                <input
+                  v-model="form.wholesale_price_usd"
+                  type="number"
+                  step="0.01"
+                  placeholder="Не указана"
+                  class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+                />
+                <p
+                  v-if="wholesalePriceKztPreview"
+                  class="text-xs text-[#3B82F6] mt-1.5 font-light"
+                >
+                  ≈ {{ wholesalePriceKztPreview }} ₸
+                </p>
+              </div>
+
+              <!-- Мин партия оптом -->
+              <div>
+                <label
+                  class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-2 font-light"
+                >
+                  Мин. количество для опта (шт.)
+                </label>
+                <input
+                  v-model="form.min_wholesale_quantity"
+                  type="number"
+                  min="1"
+                  placeholder="10"
+                  class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+                />
+                <p class="text-xs text-[#9BA1AB]/70 mt-1.5 font-light">
+                  Минимальный объем закупки для получения оптовой цены
+                </p>
+              </div>
             </div>
           </div>
 
           <div>
-            >
             <label
               class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
             >
-              Категория *
+              Категория
             </label>
             <div class="space-y-2">
               <select
                 v-model="form.category"
                 class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light appearance-none cursor-pointer"
               >
-                <option value="" disabled>Выберите категорию</option>
+                <option value="">Без категории</option>
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>
@@ -369,7 +481,20 @@ onMounted(async () => {
           </div>
 
           <div>
+            <label
+              class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
             >
+              Ссылка на источник / поставщика
+            </label>
+            <input
+              v-model="form.source_url"
+              type="url"
+              placeholder="https://supplier.example.com/product/..."
+              class="w-full px-4 py-3 bg-[#13151A] border border-[#333842] text-[#E8E9ED] focus:outline-none focus:border-[#3B82F6] transition-colors duration-300 font-light"
+            />
+          </div>
+
+          <div>
             <label
               class="block text-xs text-[#9BA1AB] tracking-[0.15em] uppercase mb-3 font-light"
             >

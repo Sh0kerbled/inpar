@@ -60,6 +60,11 @@ const getProductPriceKzt = (product) => {
   if (!product) return "0";
   return formatNiceKztFromUsd(product.price_usd, exchangeRate.value);
 };
+
+const getProductWholesalePriceKzt = (product) => {
+  if (!product || product.wholesale_price_usd == null) return null;
+  return formatNiceKztFromUsd(product.wholesale_price_usd, exchangeRate.value);
+};
 </script>
 
 <template>
@@ -308,14 +313,26 @@ const getProductPriceKzt = (product) => {
               />
 
               <div
-                v-if="product.category_name"
+                v-if="product.category_name && product.category_name !== 'Без категории'"
                 class="absolute top-4 left-4 px-3 py-1 bg-[#B8A276]/20 border border-[#B8A276]/50 text-[#B8A276] text-xs font-light tracking-wider rounded-full backdrop-blur-sm"
               >
                 {{ product.category_name }}
               </div>
+
+              <!-- Wholesale available badge -->
+              <div
+                v-if="product.wholesale_price_usd"
+                class="absolute top-4 right-4 px-2.5 py-1 bg-[#3B82F6]/25 border border-[#3B82F6]/60 text-[#60A5FA] text-[11px] font-medium tracking-wide rounded-full backdrop-blur-sm flex items-center gap-1 shadow-lg"
+              >
+                <span>Опт от {{ product.min_wholesale_quantity || 1 }} шт.</span>
+              </div>
             </div>
 
             <div class="p-6">
+              <div v-if="product.sku" class="text-[11px] text-[#9BA1AB]/60 font-mono mb-1">
+                {{ t("catalog.sku", "Арт:") }} {{ product.sku }}
+              </div>
+
               <h3
                 class="text-lg font-light tracking-tight mb-2 text-[#E8E9ED] line-clamp-2 group-hover:text-[#B8A276] transition-colors duration-300"
               >
@@ -329,26 +346,50 @@ const getProductPriceKzt = (product) => {
               <div
                 class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 backdrop-blur-sm transition-colors duration-300 group-hover:border-[#3B82F6]/20"
               >
-                <div class="space-y-1">
-                  <p
-                    class="text-2xl tracking-tight text-[#B8A276] transition-transform duration-300 group-hover:scale-105 origin-left"
-                  >
-                    ₸{{ getProductPriceKzt(product) }}
-                  </p>
+                <div class="flex items-baseline justify-between">
+                  <div>
+                    <span class="text-[10px] text-[#9BA1AB] uppercase tracking-wider block font-light">
+                      Розница
+                    </span>
+                    <p
+                      class="text-2xl tracking-tight text-[#B8A276] transition-transform duration-300 group-hover:scale-105 origin-left"
+                    >
+                      ₸{{ getProductPriceKzt(product) }}
+                    </p>
+                  </div>
                   <p class="text-sm font-medium text-zinc-400">
                     ${{ product.price_usd }}
                   </p>
                 </div>
+
+                <!-- Блок оптовой цены в карточке -->
+                <div
+                  v-if="product.wholesale_price_usd"
+                  class="mt-3 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs"
+                >
+                  <span class="text-[#60A5FA] font-light flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#3B82F6] animate-pulse"></span>
+                    {{ t("catalog.wholesalePriceFrom", { qty: product.min_wholesale_quantity || 1 }) }}
+                  </span>
+                  <div class="text-right">
+                    <span class="font-medium text-[#E8E9ED]">
+                      ₸{{ getProductWholesalePriceKzt(product) }}
+                    </span>
+                    <span class="text-[10px] text-zinc-400 ml-1">
+                      (${{ product.wholesale_price_usd }})
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div
-                v-if="product.stock_quantity"
+                v-if="product.stock_quantity > 0"
                 class="text-xs text-[#B8A276] font-light tracking-wide mt-3 flex items-center gap-1.5"
               >
                 <span
                   class="w-1.5 h-1.5 rounded-full bg-[#B8A276] animate-pulse"
                 />
-                {{ t("catalog.inStock") }} {{ product.stock_quantity }}
+                {{ t("catalog.inStock") }} {{ product.stock_quantity }} {{ t("catalog.pieces", "шт.") }}
               </div>
               <div
                 v-else

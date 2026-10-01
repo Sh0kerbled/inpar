@@ -28,9 +28,13 @@ class Category(BaseModel):
 class Product(BaseModel):
     """Product model"""
     name = models.CharField(max_length=200)
-    description = models.TextField()
-    price_usd = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price in USD")
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='products')
+    sku = models.CharField(max_length=100, blank=True, null=True, db_index=True, help_text="Product code / SKU")
+    description = models.TextField(blank=True, null=True)
+    price_usd = models.DecimalField(max_digits=10, decimal_places=2, help_text="Retail price in USD")
+    wholesale_price_usd = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Wholesale price in USD")
+    min_wholesale_quantity = models.IntegerField(default=1, null=True, blank=True, help_text="Minimum quantity for wholesale")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
+    source_url = models.URLField(max_length=500, blank=True, null=True, help_text="Source URL")
     is_active = models.BooleanField(default=True)
     main_image = models.ImageField(upload_to='products/', blank=True, null=True)
     stock_quantity = models.IntegerField(default=0)
@@ -39,6 +43,7 @@ class Product(BaseModel):
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['name']),
+            models.Index(fields=['sku']),
             models.Index(fields=['category']),
             models.Index(fields=['price_usd']),
         ]

@@ -25,18 +25,18 @@ class ProductCharacteristicInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'price_usd', 'stock_quantity', 'is_active', 'created_at', 'image_preview']
-    list_filter = ['is_active', 'category', 'price_usd', 'created_at']
-    search_fields = ['name', 'description']
+    list_display = ['name', 'sku', 'category', 'price_usd', 'wholesale_price_usd', 'min_wholesale_quantity', 'stock_quantity', 'is_active', 'created_at', 'image_preview']
+    list_filter = ['is_active', 'category', 'created_at']
+    search_fields = ['name', 'sku', 'description']
     readonly_fields = ['created_at', 'updated_at', 'main_image_preview']
     inlines = [ProductImageInline, ProductCharacteristicInline]
 
     fieldsets = (
         ('Basic Info', {
-            'fields': ('name', 'description', 'category', 'is_active')
+            'fields': ('name', 'sku', 'category', 'description', 'source_url', 'is_active')
         }),
         ('Pricing & Stock', {
-            'fields': ('price_usd', 'stock_quantity')
+            'fields': ('price_usd', 'wholesale_price_usd', 'min_wholesale_quantity', 'stock_quantity')
         }),
         ('Images', {
             'fields': ('main_image', 'main_image_preview')

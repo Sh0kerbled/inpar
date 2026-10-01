@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* ===== PROJECTS PAGE ===== */
+  .proj-hero { position:relative; padding:clamp(5rem,10vw,8rem) 1.5rem 3rem; }
+  .proj-hero-inner { max-width:1344px; margin:0 auto; }
+  .proj-badge-row { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; opacity:0; transition:opacity 600ms cubic-bezier(0.25,1,0.5,1); }
+  .proj-badge-row.in { opacity:1; }
+  .proj-badge-line { height:1px; width:2rem; background:#B8A276; flex-shrink:0; }
+  .proj-badge-text { color:#B8A276; font-size:.75rem; letter-spacing:.15em; text-transform:uppercase; font-weight:300; }
+  .proj-title-row { display:flex; flex-direction:column; gap:1.5rem; opacity:0; transition:opacity 600ms 100ms cubic-bezier(0.25,1,0.5,1); }
+  .proj-title-row.in { opacity:1; }
+  @media (min-width:1024px) { .proj-title-row { flex-direction:row; align-items:flex-end; justify-content:space-between; } }
+  .proj-title { font-size:clamp(2rem,5vw,3rem); font-weight:300; letter-spacing:-.02em; color:#E8E9ED; line-height:1.1; }
+  .proj-count { display:flex; align-items:center; gap:.75rem; flex-shrink:0; }
+  .proj-count-num { font-size:clamp(1.75rem,4vw,2.5rem); font-weight:300; color:#B8A276; line-height:1; }
+  .proj-count-label { color:#9BA1AB; font-size:.8rem; max-width:120px; line-height:1.5; font-weight:300; }
+
+  /* Filters */
+  .filters-wrap { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:3rem; opacity:0; transition:opacity 600ms 150ms ease; }
+  .filters-wrap.in { opacity:1; }
+  .filter-btn {
+    padding:.45rem 1.25rem; font-size:.8rem; letter-spacing:.08em; text-transform:uppercase;
+    border:1px solid #333842; color:#9BA1AB; background:transparent; cursor:pointer;
+    transition:border-color 250ms,color 250ms,background 250ms;
+  }
+  .filter-btn:hover { border-color:rgba(59,130,246,0.5); color:#E8E9ED; }
+  .filter-btn.active { border-color:#B8A276; color:#B8A276; background:rgba(184,162,118,0.05); }
+
+  /* Grid */
+  .projects-grid { max-width:1344px; margin:0 auto; padding:0 1.5rem 5rem; }
+  .proj-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr)); gap:1.5rem; }
+
+  /* Card */
+  .proj-card {
+    position:relative; display:flex; flex-direction:column;
+    border:1px solid #333842;
+    background:linear-gradient(135deg,rgba(26,29,35,0.6),rgba(37,41,50,0.3));
+    overflow:hidden;
+    transition:border-color 500ms ease, opacity 500ms ease, transform 500ms ease;
+    opacity:0; transform:translateY(32px);
+  }
+  .proj-card.visible { opacity:1; transform:translateY(0); }
+  .proj-card.hidden-card { display:none; }
+  .proj-card:hover { border-color:rgba(184,162,118,0.4); }
+  .proj-card-corner {
+    position:absolute; top:0; right:0; width:4rem; height:4rem;
+    border-top:1px solid transparent; border-right:1px solid transparent;
+    transition:border-color 500ms; pointer-events:none; z-index:1;
+  }
+  .proj-card:hover .proj-card-corner { border-color:rgba(184,162,118,0.3); }
+
+  /* Card image */
+  .proj-card-img { position:relative; height:13rem; overflow:hidden; flex-shrink:0; }
+  .proj-card-img img {
+    width:100%; height:100%; object-fit:cover;
+    opacity:.6; transition:opacity 700ms ease, transform 700ms ease;
+  }
+  .proj-card:hover .proj-card-img img { opacity:.8; transform:scale(1.05); }
+  .proj-card-img-overlay {
+    position:absolute; inset:0;
+    background:linear-gradient(to top,#1A1D23 0%,rgba(26,29,35,0.3) 50%,transparent 100%);
+    pointer-events:none;
+  }
+  .proj-card-loc {
+    position:absolute; top:1rem; left:1rem;
+    display:inline-flex; align-items:center;
+    padding:.25rem .75rem;
+    background:rgba(26,29,35,0.8); border:1px solid #333842;
+    color:#A8ADB5; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  }
+  .proj-card-area {
+    position:absolute; top:1rem; right:1rem;
+    display:inline-flex; align-items:center;
+    padding:.25rem .75rem;
+    background:rgba(184,162,118,0.15); border:1px solid rgba(184,162,118,0.3);
+    color:#B8A276; font-size:.7rem;
+  }
+
+  /* Card body */
+  .proj-card-body { display:flex; flex-direction:column; flex:1; padding:1.5rem; }
+  .proj-card-name {
+    font-size:1rem; font-weight:300; letter-spacing:-.01em;
+    color:#E8E9ED; margin-bottom:1rem; line-height:1.45;
+    transition:color 300ms;
+  }
+  .proj-card:hover .proj-card-name { color:#fff; }
+  .proj-card-systems { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:auto; }
+  .sys-tag {
+    display:inline-flex; align-items:center; gap:.4rem;
+    padding:.25rem .625rem;
+    border:1px solid #333842; background:rgba(37,41,50,0.6);
+  }
+  .sys-tag svg { width:12px; height:12px; flex-shrink:0; }
+  .sys-tag span { font-size:.7rem; color:#9BA1AB; font-weight:300; }
+
+  /* Empty */
+  .proj-empty {
+    grid-column:1/-1;
+    display:flex; flex-direction:column; align-items:center;
+    padding:6rem 2rem; color:#9BA1AB; text-align:center;
+  }
+  .proj-empty svg { width:48px; height:48px; color:#333842; margin-bottom:1.25rem; }
+  .proj-empty p { font-size:1.1rem; font-weight:300; }
+
+  /* Scroll reveal */
+  .sa-header { opacity:0; transition:opacity 600ms cubic-bezier(0.25,1,0.5,1); }
+  .sa-header.in { opacity:1; }
+
+  @media (max-width:640px) {
+    .filter-btn { padding:.4rem .875rem; font-size:.72rem; }
+  }
+</style>
+
+<!-- SECTION HEADER -->
+<section class="proj-hero">
+  <div class="proj-hero-inner">
+    <div class="proj-badge-row sa-header">
+      <div class="proj-badge-line"></div>
+      <span class="proj-badge-text" data-i18n="projects.badge">Реализованные проекты</span>
+    </div>
+    <div class="proj-title-row sa-header" style="transition-delay:100ms">
+      <h1 class="proj-title" data-i18n="projects.title">Проекты</h1>
+      <div class="proj-count">
+        <span class="proj-count-num">25+</span>
+        <span class="proj-count-label" data-i18n="projects.countLabel">реализованных объектов по всему миру</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTERS -->
+<div class="projects-grid">
+  <div class="filters-wrap sa-header" id="filters" style="transition-delay:200ms">
+    <button class="filter-btn active" data-filter="all" data-i18n="projects.filters.all">Все</button>
+    <button class="filter-btn" data-filter="hotel" data-i18n="projects.filters.hotel">Отели</button>
+    <button class="filter-btn" data-filter="mall" data-i18n="projects.filters.mall">Торговые центры</button>
+    <button class="filter-btn" data-filter="office" data-i18n="projects.filters.office">Офисы</button>
+    <button class="filter-btn" data-filter="residential" data-i18n="projects.filters.residential">Жилые</button>
+    <button class="filter-btn" data-filter="public" data-i18n="projects.filters.public">Общественные</button>
+  </div>
+
+  <!-- GRID -->
+  <div class="proj-grid" id="proj-grid">
+    <!-- Cards rendered by JS -->
+  </div>
+</div>
+
+{% verbatim %}
+<script>
+(function(){
+
+  /* =========================================================
+     SYSTEM ICONS & LABELS
+  ========================================================= */
+  const SYSTEMS = {
+    fire:       { color:'#D00000', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.047 8.254 8.254 0 019 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.468 5.99 5.99 0 00-1.925 3.547 5.975 5.975 0 01-2.133-1A3.75 3.75 0 0012 18z"/>' },
+    access:     { color:'#B8A276', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/>' },
+    cctv:       { color:'#A8ADB5', svg:'<path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/>' },
+    lighting:   { color:'#3B82F6', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>' },
+    audio:      { color:'#B8A276', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/>' },
+    network:    { color:'#A8ADB5', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75"/>' },
+    smart:      { color:'#3B82F6', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>' },
+    parking:    { color:'#A8ADB5', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/>' },
+    wifi:       { color:'#3B82F6', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z"/>' },
+    tv:         { color:'#B8A276', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z"/>' },
+    hvac:       { color:'#A8ADB5', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>' },
+    conference: { color:'#3B82F6', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>' },
+    phone:      { color:'#B8A276', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/>' },
+    security:   { color:'#D00000', svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>' },
+  };
+
+  /* =========================================================
+     TRANSLATIONS
+  ========================================================= */
+  const T = {
+    ru: {
+      badge:'Реализованные проекты', title:'Проекты', countLabel:'реализованных объектов по всему миру', empty:'Проекты не найдены',
+      'filters.all':'Все','filters.hotel':'Отели','filters.mall':'Торговые центры','filters.office':'Офисы','filters.residential':'Жилые','filters.public':'Общественные',
+      'systems.fire':'Пожарная сигнализация','systems.access':'Контроль доступа','systems.cctv':'Видеонаблюдение','systems.lighting':'Освещение',
+      'systems.audio':'Аудиосистема','systems.network':'Сети','systems.smart':'Умный дом','systems.parking':'Парковка',
+      'systems.wifi':'Wi-Fi','systems.tv':'ТВ-системы','systems.hvac':'Вентиляция','systems.conference':'Конференц-связь','systems.phone':'Телефония','systems.security':'Охранная сигнализация',
+      'cities.almaty':'Алматы','cities.astana':'Астана','cities.ekaterinburg':'Екатеринбург','cities.tripoli':'Триполи, Ливия',
+      'cities.shymkent':'Шымкент','cities.turkestan':'Туркестан','cities.aktobe':'Актобе','cities.qyzylorda':'Қызылорда','cities.boroboe':'Бурабай',
+    },
+    kz: {
+      badge:'Жүзеге асырылған жобалар', title:'Жобалар', countLabel:'дүние жүзінде аяқталған нысан', empty:'Жобалар табылмады',
+      'filters.all':'Барлығы','filters.hotel':'Қонақүйлер','filters.mall':'Сауда орталықтары','filters.office':'Кеңселер','filters.residential':'Тұрғын үй','filters.public':'Қоғамдық',
+      'systems.fire':'Өрт дабылы','systems.access':'Қолжетімділік бақылауы','systems.cctv':'Бейнебақылау','systems.lighting':'Жарықтандыру',
+      'systems.audio':'Дыбыс жүйесі','systems.network':'Желі','systems.smart':'Смарт үй','systems.parking':'Тұрақ',
+      'systems.wifi':'Wi-Fi','systems.tv':'ТД жүйелері','systems.hvac':'Желдету','systems.conference':'Конференц байланыс','systems.phone':'Телефония','systems.security':'Күзет дабылы',
+      'cities.almaty':'Алматы','cities.astana':'Астана','cities.ekaterinburg':'Екатеринбург','cities.tripoli':'Триполи, Ливия',
+      'cities.shymkent':'Шымкент','cities.turkestan':'Түркістан','cities.aktobe':'Ақтөбе','cities.qyzylorda':'Қызылорда','cities.boroboe':'Бурабай',
+    },
+    en: {
+      badge:'Completed Projects', title:'Projects', countLabel:'completed projects worldwide', empty:'No projects found',
+      'filters.all':'All','filters.hotel':'Hotels','filters.mall':'Shopping Malls','filters.office':'Offices','filters.residential':'Residential','filters.public':'Public',
+      'systems.fire':'Fire Alarm','systems.access':'Access Control','systems.cctv':'CCTV','systems.lighting':'Lighting',
+      'systems.audio':'Audio','systems.network':'Networks','systems.smart':'Smart Home','systems.parking':'Parking',
+      'systems.wifi':'Wi-Fi','systems.tv':'TV Systems','systems.hvac':'HVAC','systems.conference':'Conference','systems.phone':'Telephony','systems.security':'Security Alarm',
+      'cities.almaty':'Almaty','cities.astana':'Astana','cities.ekaterinburg':'Ekaterinburg','cities.tripoli':'Tripoli, Libya',
+      'cities.shymkent':'Shymkent','cities.turkestan':'Turkestan','cities.aktobe':'Aktobe','cities.qyzylorda':'Kyzylorda','cities.boroboe':'Burabay',
+    },
+  };
+
+  /* =========================================================
+     PROJECTS DATA
+  ========================================================= */
+  const LOC_KEY = { 'Алматы':'almaty','Астана':'astana','Екатеринбург':'ekaterinburg','Триполи, Ливия':'tripoli','Шымкент':'shymkent','Туркестан':'turkestan','Актобе':'aktobe','Қызылорда':'qyzylorda','Бурабай':'boroboe' };
+
+  const projects = [
+    {id:1,  name:'Almaty Esentai Ritz Carlton Hotel',       loc:'Алматы',         type:'hotel',       area:'325 000 м²', img:'{% endverbatim %}{% load static %}{% static "img/image 1.svg" %}{% verbatim %}', systems:['fire','access','cctv','lighting','conference']},
+    {id:2,  name:'Astana Khan Shatyr Shopping Mall',         loc:'Астана',         type:'mall',        area:'110 000 м²', img:'{% endverbatim %}{% static "img/image 2.svg" %}{% verbatim %}',                  systems:['fire']},
+    {id:3,  name:'Almaty AFD Building',                      loc:'Алматы',         type:'office',      area:null,         img:'{% endverbatim %}{% static "img/image 3.svg" %}{% verbatim %}',                  systems:['access']},
+    {id:4,  name:'Almaty InterContinental Hotel',            loc:'Алматы',         type:'hotel',       area:null,         img:'{% endverbatim %}{% static "img/image 4.svg" %}{% verbatim %}',                  systems:['fire','audio','conference','lighting']},
+    {id:5,  name:'Ekaterinburg MEGA Center',                 loc:'Екатеринбург',   type:'mall',        area:null,         img:'{% endverbatim %}{% static "img/image 5.svg" %}{% verbatim %}',                  systems:['fire','cctv','audio','lighting']},
+    {id:6,  name:'Almaty Forum Shopping Mall',               loc:'Алматы',         type:'mall',        area:null,         img:'{% endverbatim %}{% static "img/image 6.svg" %}{% verbatim %}',                  systems:['fire','audio','lighting']},
+    {id:7,  name:'Libya Tripoli El Nasr Hotel',              loc:'Триполи, Ливия', type:'hotel',       area:null,         img:'{% endverbatim %}{% static "img/image 7.svg" %}{% verbatim %}',                  systems:['fire','access','security','cctv','lighting']},
+    {id:8,  name:'Almaty Holiday INN Hotel',                 loc:'Алматы',         type:'hotel',       area:null,         img:'{% endverbatim %}{% static "img/image 8.svg" %}{% verbatim %}',                  systems:['cctv','access','security','audio']},
+    {id:9,  name:'Shymkent MEGA Center',                     loc:'Шымкент',        type:'mall',        area:null,         img:'{% endverbatim %}{% static "img/image 9.svg" %}{% verbatim %}',                  systems:['cctv','access','security','audio','parking']},
+    {id:10, name:'Astana EXPO 2017',                         loc:'Астана',         type:'public',      area:null,         img:'{% endverbatim %}{% static "img/image 10.svg" %}{% verbatim %}',                 systems:['lighting','fire']},
+    {id:11, name:'Astana Military Academy',                  loc:'Астана',         type:'public',      area:null,         img:'{% endverbatim %}{% static "img/image 11.svg" %}{% verbatim %}',                 systems:['lighting','smart']},
+    {id:12, name:'Almaty Beshagash KAIRAT Sport Complex',    loc:'Алматы',         type:'public',      area:null,         img:'{% endverbatim %}{% static "img/image 12.svg" %}{% verbatim %}',                 systems:['audio','conference','lighting','smart','tv']},
+    {id:13, name:'Turkistan Hoca Ahmet Yesevi Religious Complex', loc:'Туркестан', type:'public',      area:null,         img:'{% endverbatim %}{% static "img/image 13.svg" %}{% verbatim %}',                 systems:['audio','fire','phone','hvac']},
+    {id:14, name:'Aktobe City Center Shopping Mall',         loc:'Актобе',         type:'mall',        area:null,         img:'{% endverbatim %}{% static "img/image 14.svg" %}{% verbatim %}',                 systems:['fire','audio','cctv','network','lighting','hvac']},
+    {id:15, name:'Almaty KCELL Administration Building',     loc:'Алматы',         type:'office',      area:null,         img:'{% endverbatim %}{% static "img/image 15.svg" %}{% verbatim %}',                 systems:['fire','access','cctv','parking','conference']},
+    {id:16, name:'Qyzylorda Bastau Business Center',         loc:'Қызылорда',      type:'office',      area:null,         img:'{% endverbatim %}{% static "img/image 16.svg" %}{% verbatim %}',                 systems:['fire','cctv','access','conference','audio','hvac']},
+    {id:17, name:'Almaty BN Plaza',                          loc:'Алматы',         type:'office',      area:null,         img:'{% endverbatim %}{% static "img/image 17.svg" %}{% verbatim %}',                 systems:['audio']},
+    {id:18, name:'Microsoft Almaty Main Office',             loc:'Алматы',         type:'office',      area:null,         img:'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80',         systems:['conference']},
+    {id:19, name:'NARXOZ University',                        loc:'Алматы',         type:'public',      area:null,         img:'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80',         systems:['audio','conference','lighting']},
+    {id:20, name:'Almaty Orhun Medical Center',              loc:'Алматы',         type:'public',      area:null,         img:'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&q=80',         systems:['fire','audio','access','network','cctv']},
+    {id:21, name:'Boroboe Golf Club VIP Villa',              loc:'Бурабай',        type:'residential', area:null,         img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',         systems:['fire','cctv','network','smart','hvac']},
+    {id:22, name:'Almaty Golf Club VIP Villa',               loc:'Алматы',         type:'residential', area:null,         img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',         systems:['fire','cctv','security','smart','audio','wifi','hvac']},
+    {id:23, name:'Almaty Arman VIP Home',                    loc:'Алматы',         type:'residential', area:null,         img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',         systems:['fire','cctv','smart','audio','wifi','hvac']},
+    {id:24, name:'Almaty Yubileyni Villa',                   loc:'Алматы',         type:'residential', area:null,         img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80',         systems:['smart','audio']},
+    {id:25, name:'Shymkent Astana Motors',                   loc:'Шымкент',        type:'office',      area:null,         img:'https://images.unsplash.com/photo-1550355291-bbee04a92027?w=800&q=80',         systems:['cctv','access','security','audio']},
+  ];
+
+  /* =========================================================
+     STATE & LOCALE
+  ========================================================= */
+  let lang = localStorage.getItem('user-locale') || 'ru';
+  let activeFilter = 'all';
+
+  function t(key) { return T[lang][key] || key; }
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
+  function renderI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      const v = T[lang][k];
+      if (v) el.textContent = v;
+    });
+  }
+
+  function renderFilters() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      const key = btn.dataset.filter;
+      btn.textContent = t('filters.' + key);
+      btn.classList.toggle('active', key === activeFilter);
+    });
+  }
+
+  function sysTagHtml(key) {
+    const s = SYSTEMS[key];
+    if (!s) return '';
+    return `<div class="sys-tag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="${s.color}" stroke-width="2">${s.svg}</svg>
+      <span>${t('systems.' + key)}</span>
+    </div>`;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('proj-grid');
+    const list = activeFilter === 'all' ? projects : projects.filter(p => p.type === activeFilter);
+
+    if (!list.length) {
+      grid.innerHTML = `<div class="proj-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+        <p>${t('empty')}</p>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map((p, i) => {
+      const locKey = LOC_KEY[p.loc] || p.loc;
+      const locLabel = t('cities.' + locKey);
+      const areaTag = p.area ? `<div class="proj-card-area">${p.area}</div>` : '';
+      const sysTags = p.systems.map(s => sysTagHtml(s)).join('');
+
+      return `<article class="proj-card" data-id="${p.id}" style="transition-delay:${(i % 9) * 50}ms">
+        <div class="proj-card-corner"></div>
+        <div class="proj-card-img">
+          <img src="${p.img}" alt="${p.name}" width="800" height="450" loading="lazy">
+          <div class="proj-card-img-overlay"></div>
+          <div class="proj-card-loc">${locLabel}</div>
+          ${areaTag}
+        </div>
+        <div class="proj-card-body">
+          <h3 class="proj-card-name">${p.name}</h3>
+          <div class="proj-card-systems">${sysTags}</div>
+        </div>
+      </article>`;
+    }).join('');
+
+    // Animate in
+    requestAnimationFrame(() => {
+      grid.querySelectorAll('.proj-card').forEach((card, i) => {
+        setTimeout(() => card.classList.add('visible'), (i % 9) * 50);
+      });
+    });
+  }
+
+  /* =========================================================
+     FILTER CLICK
+  ========================================================= */
+  document.getElementById('filters').addEventListener('click', function(e) {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    activeFilter = btn.dataset.filter;
+    renderFilters();
+    // Fade out → re-render → fade in
+    const grid = document.getElementById('proj-grid');
+    grid.style.opacity = '0';
+    grid.style.transition = 'opacity 200ms ease';
+    setTimeout(() => {
+      renderGrid();
+      grid.style.opacity = '';
+      grid.style.transition = '';
+    }, 200);
+  });
+
+  /* =========================================================
+     LOCALE SYNC
+  ========================================================= */
+  const _orig = window.setLocale;
+  window.setLocale = function(l) {
+    lang = l;
+    if (_orig) _orig(l);
+    renderI18n();
+    renderFilters();
+    renderGrid();
+  };
+
+  /* =========================================================
+     SCROLL REVEAL
+  ========================================================= */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.sa-header').forEach(el => io.observe(el));
+
+  /* =========================================================
+     INIT
+  ========================================================= */
+  lang = localStorage.getItem('user-locale') || 'ru';
+  renderI18n();
+  renderFilters();
+  renderGrid();
+
+})();
+</script>
+{% endverbatim %}
+
+{% endblock content %}

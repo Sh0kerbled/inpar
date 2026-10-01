@@ -49,13 +49,27 @@ const productPriceKzt = computed(() => {
   return formatNiceKztPrice(rawPrice);
 });
 
+const productWholesalePriceKzt = computed(() => {
+  const p = product.value;
+  if (!p || p.wholesale_price_usd == null) return null;
+  const rawPrice = p.wholesale_price_kzt
+    ? Number(p.wholesale_price_kzt)
+    : calculateKztFromUsd(p.wholesale_price_usd, exchangeRate.value);
+  return formatNiceKztPrice(rawPrice);
+});
+
 const whatsappLink = computed(() => {
   const current = product.value;
   if (!current) return "#";
 
+  let priceInfo = `₸${productPriceKzt.value}`;
+  if (productWholesalePriceKzt.value) {
+    priceInfo += ` | Опт от ${current.min_wholesale_quantity || 1} шт.: ₸${productWholesalePriceKzt.value}`;
+  }
+
   const message = t("catalog.whatsappMessage", {
     name: current.name,
-    price: productPriceKzt.value,
+    price: priceInfo,
     url: window.location.href,
   });
 
@@ -114,16 +128,30 @@ const whatsappLink = computed(() => {
           </div>
 
           <div class="flex flex-col justify-center">
-            <div
-              v-if="product.category_name"
-              class="flex items-center gap-2 mb-6"
-            >
-              <Tag class="w-3.5 h-3.5 text-[#B8A276]" :stroke-width="1.5" />
-              <span
-                class="text-xs text-[#B8A276] tracking-widest uppercase font-light"
+            <!-- Badges: Category, SKU, Wholesale -->
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+              <div
+                v-if="product.category_name && product.category_name !== 'Без категории'"
+                class="flex items-center gap-1.5 px-3 py-1 bg-[#B8A276]/15 border border-[#B8A276]/40 text-[#B8A276] text-xs font-light tracking-wider rounded-full"
               >
-                {{ product.category_name }}
-              </span>
+                <Tag class="w-3.5 h-3.5" :stroke-width="1.5" />
+                <span>{{ product.category_name }}</span>
+              </div>
+
+              <div
+                v-if="product.sku"
+                class="px-3 py-1 bg-[#1A1D23] border border-[#333842] text-[#9BA1AB] text-xs font-mono rounded-full"
+              >
+                Арт: {{ product.sku }}
+              </div>
+
+              <div
+                v-if="product.wholesale_price_usd"
+                class="px-3 py-1 bg-[#3B82F6]/15 border border-[#3B82F6]/50 text-[#60A5FA] text-xs font-medium tracking-wide rounded-full flex items-center gap-1.5"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#3B82F6] animate-pulse"></span>
+                <span>Доступен опт</span>
+              </div>
             </div>
 
             <h1
@@ -133,28 +161,68 @@ const whatsappLink = computed(() => {
             </h1>
 
             <p
-              class="text-[#9BA1AB] text-base leading-relaxed font-light mb-10"
+              class="text-[#9BA1AB] text-base leading-relaxed font-light mb-8"
             >
-              {{ product.description }}
+              {{ product.description || t("catalog.premiumQuality") }}
             </p>
 
-            <div class="flex items-baseline gap-2 mb-6">
-              <span class="text-4xl font-light text-[#3B82F6]">
-                {{ productPriceKzt }}
+            <!-- Розничная цена -->
+            <div class="mb-4">
+              <span class="text-xs text-[#9BA1AB] uppercase tracking-wider block font-light mb-1">
+                Розничная цена
               </span>
-              <span class="text-xl text-[#9BA1AB]">₸</span>
+              <div class="flex items-baseline gap-3">
+                <div class="flex items-baseline gap-1">
+                  <span class="text-4xl font-light text-[#B8A276]">
+                    {{ productPriceKzt }}
+                  </span>
+                  <span class="text-xl text-[#B8A276]/80 font-light">₸</span>
+                </div>
+                <span class="text-sm font-medium text-zinc-400">
+                  ${{ product.price_usd }}
+                </span>
+              </div>
             </div>
 
+            <!-- Блок оптовой цены (если есть) -->
+            <div
+              v-if="product.wholesale_price_usd"
+              class="mb-6 p-4 rounded-xl border border-[#3B82F6]/40 bg-[#3B82F6]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg shadow-[#3B82F6]/5"
+            >
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#3B82F6] animate-pulse"></span>
+                  <span class="text-xs uppercase tracking-wider text-[#60A5FA] font-medium">
+                    Оптовая цена
+                  </span>
+                </div>
+                <p class="text-xs text-[#9BA1AB] mt-1 font-light">
+                  При заказе от <strong class="text-[#E8E9ED]">{{ product.min_wholesale_quantity || 1 }} шт.</strong>
+                </p>
+              </div>
+              <div class="text-left sm:text-right">
+                <div class="text-2xl font-light text-[#E8E9ED]">
+                  {{ productWholesalePriceKzt }} <span class="text-base text-[#9BA1AB]">₸</span>
+                </div>
+                <div class="text-xs text-[#60A5FA] font-light">
+                  ${{ product.wholesale_price_usd }} / шт.
+                </div>
+              </div>
+            </div>
+
+            <!-- Наличие на складе (всего) -->
             <div class="mb-8">
-              <span
+              <div
                 v-if="product.stock_quantity > 0"
-                class="text-sm text-[#B8A276] font-light"
+                class="flex items-center gap-2 text-sm text-[#B8A276] font-light"
               >
-                {{ t("catalog.inStock") }} {{ product.stock_quantity }} шт.
-              </span>
-              <span v-else class="text-sm text-[#9BA1AB]/50 font-light">
-                {{ t("catalog.outOfStock") }}
-              </span>
+                <span class="w-2 h-2 rounded-full bg-[#B8A276] animate-pulse"></span>
+                <span>{{ t("catalog.totalStock", "В наличии на складе:") }} <strong>{{ product.stock_quantity }} {{ t("catalog.pieces", "шт.") }}</strong></span>
+              </div>
+              <div v-else class="flex items-center gap-2 text-sm text-[#9BA1AB]/60 font-light">
+                <span class="w-2 h-2 rounded-full bg-[#9BA1AB]/40"></span>
+                <span>{{ t("catalog.outOfStock") }}</span>
+              </div>
             </div>
 
             <a

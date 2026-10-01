@@ -191,6 +191,135 @@ export const useProductStore = defineStore("products", () => {
     }
   };
 
+  const importExcel = async (file, defaultCategoryId = null, currency = "KZT") => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      if (defaultCategoryId) {
+        formData.append("category", defaultCategoryId);
+      }
+      formData.append("currency", currency);
+      const response = await api.post("/products/import-excel/", formData);
+      await getProducts();
+      await getCategories();
+      return response.data;
+    } catch (err) {
+      error.value =
+        err.response?.data?.errors?.[0] ||
+        err.response?.data?.error ||
+        err.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const clearUncategorizedProducts = async () => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const response = await api.post("/products/clear-uncategorized/");
+      await getProducts();
+      await getCategories();
+      return response.data;
+    } catch (err) {
+      error.value = err.response?.data?.detail || err.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const downloadExcelTemplate = async () => {
+    try {
+      const response = await api.get("/products/export-template/", {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "inpar_products_template.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to download template:", err);
+      throw err;
+    }
+  };
+
+  const createCategory = async (catData) => {
+    try {
+      const response = await api.post("/categories/", catData);
+      await getCategories();
+      return response.data;
+    } catch (err) {
+      error.value = err.response?.data?.name?.[0] || err.message;
+      throw err;
+    }
+  };
+
+  const updateCategory = async (id, catData) => {
+    try {
+      const response = await api.patch(`/categories/${id}/`, catData);
+      await getCategories();
+      await getProducts();
+      return response.data;
+    } catch (err) {
+      error.value = err.response?.data?.name?.[0] || err.message;
+      throw err;
+    }
+  };
+
+  const deleteCategory = async (id) => {
+    try {
+      await api.delete(`/categories/${id}/`);
+      await getCategories();
+      await getProducts();
+      return true;
+    } catch (err) {
+      error.value = err.response?.data?.detail || err.message;
+      throw err;
+    }
+  };
+
+  const bulkDeleteProducts = async ({ ids = [], all = false }) => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const response = await api.post("/products/bulk-delete/", { ids, all });
+      await getProducts();
+      return response.data;
+    } catch (err) {
+      error.value = err.response?.data?.error || err.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const bulkSetCategory = async ({ ids, categoryId }) => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const response = await api.post("/products/bulk-set-category/", {
+        ids,
+        category_id: categoryId,
+      });
+      await getProducts();
+      await getCategories();
+      return response.data;
+    } catch (err) {
+      error.value = err.response?.data?.error || err.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   return {
     products,
     categories,
@@ -200,8 +329,16 @@ export const useProductStore = defineStore("products", () => {
     getProducts,
     getProduct,
     getCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
     createProduct,
     updateProduct,
     deleteProduct,
+    bulkDeleteProducts,
+    bulkSetCategory,
+    importExcel,
+    downloadExcelTemplate,
+    clearUncategorizedProducts,
   };
 });

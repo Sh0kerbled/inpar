@@ -4,9 +4,11 @@ from .utils import get_usd_to_kzt_rate
 
 class CategorySerializer(serializers.ModelSerializer):
     """Category serializer"""
+    products_count = serializers.IntegerField(source='products.count', read_only=True)
+
     class Meta:
         model = Category
-        fields = ['id', 'name', 'description', 'image', 'is_active', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'image', 'is_active', 'products_count', 'created_at', 'updated_at']
 
 
 class ProductCharacteristicSerializer(serializers.ModelSerializer):
@@ -25,12 +27,17 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for product list (search results, category view)"""
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True, default=None)
     price_kzt = serializers.SerializerMethodField()
+    wholesale_price_kzt = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'price_usd', 'price_kzt', 'main_image', 'category_name', 'category', 'stock_quantity']
+        fields = [
+            'id', 'sku', 'name', 'price_usd', 'price_kzt',
+            'wholesale_price_usd', 'wholesale_price_kzt', 'min_wholesale_quantity',
+            'main_image', 'category_name', 'category', 'stock_quantity'
+        ]
     
     def get_price_kzt(self, obj):
         """Calculate price in KZT based on exchange rate"""
@@ -38,18 +45,29 @@ class ProductListSerializer(serializers.ModelSerializer):
         price_kzt = obj.price_usd * exchange_rate
         return round(price_kzt, 2)
 
+    def get_wholesale_price_kzt(self, obj):
+        """Calculate wholesale price in KZT based on exchange rate"""
+        if obj.wholesale_price_usd is None:
+            return None
+        exchange_rate = get_usd_to_kzt_rate()
+        price_kzt = obj.wholesale_price_usd * exchange_rate
+        return round(price_kzt, 2)
+
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     """Full product serializer with images and characteristics"""
     images = ProductImageSerializer(many=True, read_only=True)
     characteristics = ProductCharacteristicSerializer(many=True, read_only=True)
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True, default=None)
     price_kzt = serializers.SerializerMethodField()
+    wholesale_price_kzt = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'description', 'price_usd', 'price_kzt', 'category', 'category_name',
+            'id', 'sku', 'name', 'description', 'price_usd', 'price_kzt',
+            'wholesale_price_usd', 'wholesale_price_kzt', 'min_wholesale_quantity',
+            'category', 'category_name', 'source_url',
             'is_active', 'main_image', 'stock_quantity', 'images', 'characteristics',
             'created_at', 'updated_at'
         ]
@@ -58,15 +76,26 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         exchange_rate = get_usd_to_kzt_rate()
         return round(obj.price_usd * exchange_rate, 2)
 
+    def get_wholesale_price_kzt(self, obj):
+        if obj.wholesale_price_usd is None:
+            return None
+        exchange_rate = get_usd_to_kzt_rate()
+        return round(obj.wholesale_price_usd * exchange_rate, 2)
+
 
 class ProductCreateUpdateSerializer(serializers.ModelSerializer):
     """Serializer for admin CRUD operations"""
     characteristics = ProductCharacteristicSerializer(many=True, required=False)
+    category_name = serializers.CharField(source='category.name', read_only=True, default=None)
+    price_kzt = serializers.SerializerMethodField()
+    wholesale_price_kzt = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'description', 'price_usd', 'category',
+            'id', 'sku', 'name', 'description', 'price_usd', 'price_kzt',
+            'wholesale_price_usd', 'wholesale_price_kzt', 'min_wholesale_quantity',
+            'category', 'category_name', 'source_url',
             'is_active', 'main_image', 'stock_quantity', 'characteristics',
             'created_at', 'updated_at'
         ]
@@ -76,6 +105,16 @@ class ProductCreateUpdateSerializer(serializers.ModelSerializer):
             'default': True,
         },
     }
+
+    def get_price_kzt(self, obj):
+        exchange_rate = get_usd_to_kzt_rate()
+        return round(obj.price_usd * exchange_rate, 2)
+
+    def get_wholesale_price_kzt(self, obj):
+        if obj.wholesale_price_usd is None:
+            return None
+        exchange_rate = get_usd_to_kzt_rate()
+        return round(obj.wholesale_price_usd * exchange_rate, 2)
 
     def create(self, validated_data):
         characteristics_data = validated_data.pop('characteristics', [])
