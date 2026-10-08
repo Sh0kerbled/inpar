@@ -100,10 +100,13 @@ class ProductCreateUpdateSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
     extra_kwargs = {
-        'is_active': {
-            'required': False,
-            'default': True,
-        },
+        'is_active': {'required': False, 'default': True},
+        'wholesale_price_usd': {'required': False, 'allow_null': True},
+        'min_wholesale_quantity': {'required': False, 'allow_null': True},
+        'sku': {'required': False, 'allow_null': True, 'allow_blank': True},
+        'source_url': {'required': False, 'allow_null': True, 'allow_blank': True},
+        'description': {'required': False, 'allow_null': True, 'allow_blank': True},
+        'main_image': {'required': False, 'allow_null': True},
     }
 
     def get_price_kzt(self, obj):

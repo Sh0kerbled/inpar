@@ -178,9 +178,9 @@ onUnmounted(() => {
                   {{ t("contact.email") }}
                 </div>
                 <a
-                  href="mailto:info@inpar.kz"
+                  href="mailto:burak.kirnapci@inpar.kz"
                   class="text-[#E8E9ED] hover:text-[#3B82F6] transition-colors duration-300 font-light"
-                  >info@inpar.kz</a
+                  >burak.kirnapci@inpar.kz</a
                 >
               </div>
               <div>

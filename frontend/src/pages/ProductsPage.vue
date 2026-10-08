@@ -346,7 +346,8 @@ const getProductWholesalePriceKzt = (product) => {
               <div
                 class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 backdrop-blur-sm transition-colors duration-300 group-hover:border-[#3B82F6]/20"
               >
-                <div class="flex items-baseline justify-between">
+                <!-- Если есть розничная цена -->
+                <div v-if="product.price_usd && Number(product.price_usd) > 0" class="flex items-baseline justify-between">
                   <div>
                     <span class="text-[10px] text-[#9BA1AB] uppercase tracking-wider block font-light">
                       Розница
@@ -362,9 +363,26 @@ const getProductWholesalePriceKzt = (product) => {
                   </p>
                 </div>
 
-                <!-- Блок оптовой цены в карточке -->
+                <!-- Если только оптовая цена -->
+                <div v-else-if="product.wholesale_price_usd" class="flex items-baseline justify-between">
+                  <div>
+                    <span class="text-[10px] text-[#60A5FA] uppercase tracking-wider block font-medium">
+                      Опт от {{ product.min_wholesale_quantity || 1 }} шт.
+                    </span>
+                    <p
+                      class="text-2xl tracking-tight text-[#60A5FA] transition-transform duration-300 group-hover:scale-105 origin-left"
+                    >
+                      ₸{{ getProductWholesalePriceKzt(product) }}
+                    </p>
+                  </div>
+                  <p class="text-sm font-medium text-zinc-400">
+                    ${{ product.wholesale_price_usd }}
+                  </p>
+                </div>
+
+                <!-- Блок оптовой цены (если есть и розница, и опт) -->
                 <div
-                  v-if="product.wholesale_price_usd"
+                  v-if="product.wholesale_price_usd && product.price_usd && Number(product.price_usd) > 0"
                   class="mt-3 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs"
                 >
                   <span class="text-[#60A5FA] font-light flex items-center gap-1.5">

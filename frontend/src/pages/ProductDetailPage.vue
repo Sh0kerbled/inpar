@@ -14,7 +14,7 @@ const productStore = useProductStore();
 const { t } = useI18n();
 
 const exchangeRate = ref(460);
-const WHATSAPP_PHONE = "77001234567";
+const WHATSAPP_PHONE = "77019954217";
 
 // Локальный флаг готовности страницы — ждём оба запроса
 const isPageReady = ref(false);
@@ -62,9 +62,16 @@ const whatsappLink = computed(() => {
   const current = product.value;
   if (!current) return "#";
 
-  let priceInfo = `₸${productPriceKzt.value}`;
-  if (productWholesalePriceKzt.value) {
-    priceInfo += ` | Опт от ${current.min_wholesale_quantity || 1} шт.: ₸${productWholesalePriceKzt.value}`;
+  let priceInfo = "";
+  if (current.price_usd && Number(current.price_usd) > 0) {
+    priceInfo = `₸${productPriceKzt.value}`;
+    if (productWholesalePriceKzt.value) {
+      priceInfo += ` | Опт от ${current.min_wholesale_quantity || 1} шт.: ₸${productWholesalePriceKzt.value}`;
+    }
+  } else if (productWholesalePriceKzt.value) {
+    priceInfo = `Опт от ${current.min_wholesale_quantity || 1} шт.: ₸${productWholesalePriceKzt.value}`;
+  } else {
+    priceInfo = `₸${productPriceKzt.value}`;
   }
 
   const message = t("catalog.whatsappMessage", {
@@ -166,8 +173,8 @@ const whatsappLink = computed(() => {
               {{ product.description || t("catalog.premiumQuality") }}
             </p>
 
-            <!-- Розничная цена -->
-            <div class="mb-4">
+            <!-- Розничная цена (если есть) -->
+            <div v-if="product.price_usd && Number(product.price_usd) > 0" class="mb-4">
               <span class="text-xs text-[#9BA1AB] uppercase tracking-wider block font-light mb-1">
                 Розничная цена
               </span>

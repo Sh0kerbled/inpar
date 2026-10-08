@@ -23,6 +23,7 @@ import {
   Check,
   Layers,
   ArrowRight,
+  Image as ImageIcon,
 } from "lucide-vue-next";
 import api from "../services/api";
 import { formatNiceKztPrice, calculateKztFromUsd } from "../services/price";
@@ -723,16 +724,34 @@ onMounted(async () => {
                 />
               </td>
 
-              <!-- Название и SKU -->
+              <!-- Фото, Название и SKU -->
               <td class="px-6 py-4">
-                <div class="text-sm text-[#E8E9ED] font-light line-clamp-2">
-                  {{ product.name }}
-                </div>
-                <div
-                  v-if="product.sku"
-                  class="text-xs text-[#9BA1AB] font-mono mt-1"
-                >
-                  Код: {{ product.sku }}
+                <div class="flex items-center gap-3">
+                  <!-- Миниатюра фото -->
+                  <div class="w-11 h-11 rounded-lg bg-[#13151A] border border-[#333842] overflow-hidden shrink-0 flex items-center justify-center relative group">
+                    <img
+                      v-if="product.main_image"
+                      :src="product.main_image"
+                      :alt="product.name"
+                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-125"
+                    />
+                    <div v-else class="text-[#9BA1AB]/30 flex items-center justify-center">
+                      <ImageIcon class="w-4 h-4" :stroke-width="1.5" />
+                    </div>
+                  </div>
+
+                  <div class="min-w-0">
+                    <div class="text-sm text-[#E8E9ED] font-light line-clamp-2 leading-snug">
+                      {{ product.name }}
+                    </div>
+                    <div
+                      v-if="product.sku"
+                      class="text-xs text-[#9BA1AB] font-mono mt-1 flex items-center gap-1.5"
+                    >
+                      <span class="px-1.5 py-0.2 bg-[#252932] border border-[#333842] rounded text-[10px]">Код</span>
+                      <span>{{ product.sku }}</span>
+                    </div>
+                  </div>
                 </div>
               </td>
 
@@ -740,7 +759,7 @@ onMounted(async () => {
               <td class="px-6 py-4">
                 <span
                   v-if="!product.category_name || product.category_name === 'Без категории'"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 border border-amber-500/40 bg-amber-500/10 text-amber-400 text-xs font-light tracking-wide rounded cursor-pointer hover:border-amber-400"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 border border-amber-500/40 bg-amber-500/10 text-amber-400 text-xs font-light tracking-wide rounded cursor-pointer hover:border-amber-400 transition-colors"
                   @click="openCategoryManager"
                   title="Нажмите для управления категориями"
                 >
@@ -748,7 +767,7 @@ onMounted(async () => {
                 </span>
                 <span
                   v-else
-                  class="px-2 py-1 border border-[#B8A276]/30 text-[#B8A276] text-xs font-light tracking-wide rounded"
+                  class="px-2.5 py-1 border border-[#B8A276]/30 text-[#B8A276] text-xs font-light tracking-wide rounded"
                 >
                   {{ product.category_name }}
                 </span>
@@ -756,27 +775,37 @@ onMounted(async () => {
 
               <!-- Розничная цена -->
               <td class="px-6 py-4 text-right whitespace-nowrap">
-                <div class="text-sm text-[#E8E9ED] font-light">
-                  ${{ product.price_usd }}
+                <div v-if="product.price_usd && Number(product.price_usd) > 0">
+                  <div class="text-sm text-[#E8E9ED] font-light">
+                    ${{ product.price_usd }}
+                  </div>
+                  <div class="text-xs text-[#B8A276] font-light mt-0.5">
+                    ≈ {{ getProductPriceKzt(product) }} ₸
+                  </div>
                 </div>
-                <div class="text-xs text-[#B8A276] font-light mt-0.5">
-                  ≈ {{ getProductPriceKzt(product) }} ₸
+                <div v-else-if="product.wholesale_price_usd">
+                  <span class="inline-block px-2 py-0.5 text-[11px] font-medium text-sky-400 bg-sky-500/10 border border-sky-500/30 rounded">
+                    Только опт
+                  </span>
+                </div>
+                <div v-else class="text-xs text-[#9BA1AB]/40 font-light">
+                  —
                 </div>
               </td>
 
               <!-- Оптовая цена -->
               <td class="px-6 py-4 text-right whitespace-nowrap">
                 <div
-                  v-if="product.wholesale_price_usd != null"
+                  v-if="product.wholesale_price_usd != null && Number(product.wholesale_price_usd) > 0"
                   class="space-y-0.5"
                 >
                   <div class="text-sm text-[#3B82F6] font-light">
                     ${{ product.wholesale_price_usd }}
                   </div>
-                  <div class="text-xs text-[#3B82F6]/80 font-light">
+                  <div class="text-xs text-[#3B82F6]/90 font-light">
                     ≈ {{ getProductWholesalePriceKzt(product) }} ₸
                   </div>
-                  <div class="text-[10px] text-[#9BA1AB] font-light">
+                  <div class="text-[10px] text-sky-300/80 font-light">
                     от {{ product.min_wholesale_quantity || 1 }} шт.
                   </div>
                 </div>
@@ -1019,23 +1048,45 @@ onMounted(async () => {
               <CheckCircle2 class="w-4 h-4" />
               <span>Импорт успешно завершен!</span>
             </div>
-            <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-              <div class="p-2 border border-[#333842] bg-[#1A1D23]">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 text-center text-xs">
+              <div class="p-3 border border-[#333842] bg-[#1A1D23] rounded">
                 <div class="text-[#9BA1AB]">Создано</div>
-                <div class="text-base font-semibold text-emerald-400 mt-1">
+                <div class="text-lg font-semibold text-emerald-400 mt-1">
                   {{ importResult.created }}
                 </div>
               </div>
-              <div class="p-2 border border-[#333842] bg-[#1A1D23]">
+              <div class="p-3 border border-[#333842] bg-[#1A1D23] rounded">
                 <div class="text-[#9BA1AB]">Обновлено</div>
-                <div class="text-base font-semibold text-[#3B82F6] mt-1">
+                <div class="text-lg font-semibold text-[#3B82F6] mt-1">
                   {{ importResult.updated }}
                 </div>
               </div>
-              <div class="p-2 border border-[#333842] bg-[#1A1D23]">
-                <div class="text-[#9BA1AB]">Обработано строк</div>
-                <div class="text-base font-semibold text-[#E8E9ED] mt-1">
-                  {{ importResult.total_rows }}
+              <div class="p-3 border border-[#333842] bg-[#1A1D23] rounded">
+                <div class="text-[#9BA1AB]">С фото</div>
+                <div class="text-lg font-semibold text-[#B8A276] mt-1">
+                  {{ importResult.photos_count || 0 }}
+                </div>
+              </div>
+              <div class="p-3 border border-[#333842] bg-[#1A1D23] rounded">
+                <div class="text-[#9BA1AB]">С оптом</div>
+                <div class="text-lg font-semibold text-sky-400 mt-1">
+                  {{ importResult.wholesale_count || 0 }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Валюта и распознанные колонки -->
+            <div class="p-3.5 bg-[#1A1D23] border border-[#333842] rounded text-xs space-y-2">
+              <div class="flex items-center justify-between text-[#9BA1AB]">
+                <span>Валюта цен:</span>
+                <span class="text-[#E8E9ED] font-medium">{{ importResult.currency_used }}</span>
+              </div>
+              <div v-if="importResult.detected_columns && importResult.detected_columns.length" class="pt-2 border-t border-[#333842]/70">
+                <div class="text-[11px] text-[#9BA1AB] mb-1 font-medium">Распознанные колонки таблицы:</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-zinc-300">
+                  <div v-for="(colText, idx) in importResult.detected_columns" :key="idx" class="truncate" :title="colText">
+                    ✓ {{ colText }}
+                  </div>
                 </div>
               </div>
             </div>
