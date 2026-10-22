@@ -9,6 +9,7 @@ import {
   Speaker,
   Home,
   Combine,
+  ArrowRight,
 } from "lucide-vue-next";
 
 const { t } = useI18n();
@@ -24,8 +25,19 @@ const colors = [
   "#3B82F6",
 ];
 
+const serviceSlugs = [
+  "bms-dispatching",
+  "fire-safety",
+  "cctv-access-control",
+  "smart-home-knx",
+  "sound-and-light",
+  "networks-smatv",
+  "system-integration",
+];
+
 const services = computed(() =>
   Array.from({ length: 7 }, (_, i) => ({
+    slug: serviceSlugs[i],
     icon: icons[i],
     color: colors[i],
     title: t(`services.serviceItems[${i}].title`),
@@ -89,9 +101,16 @@ const services = computed(() =>
               >
                 {{ service.title }}
               </h3>
-              <p class="text-[#9BA1AB] text-sm leading-relaxed font-light">
+              <p class="text-[#9BA1AB] text-sm leading-relaxed font-light mb-4">
                 {{ service.description }}
               </p>
+              <router-link
+                :to="'/services/' + service.slug"
+                class="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-[#B8A276] hover:text-[#3B82F6] transition-colors font-medium"
+              >
+                Подробнее об услуге
+                <ArrowRight class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+              </router-link>
             </div>
             <div
               class="absolute top-0 right-0 w-16 h-16 border-t border-r border-transparent group-hover:border-[#3B82F6]/30 transition-colors duration-500"

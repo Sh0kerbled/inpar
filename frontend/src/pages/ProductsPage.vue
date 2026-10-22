@@ -13,6 +13,7 @@ import { useProductStore } from "../stores/index";
 import Navbar from "@/components/Navbar.vue";
 import api from "../services/api";
 import { formatNiceKztFromUsd } from "../services/price";
+import { updateSEO } from "../utils/seo";
 
 const { t } = useI18n();
 const productStore = useProductStore();
@@ -52,6 +53,13 @@ onMounted(async () => {
 
   categories.value = await productStore.getCategories();
   await search();
+
+  updateSEO({
+    title: "Каталог оборудования — Звуковые системы, датчики и автоматика | INPAR.KZ",
+    description: "Каталог сертифицированного оборудования для системной интеграции, звука и автоматизации в Алматы. Розничные и оптовые поставки в Казахстане от компании INPAR.",
+    keywords: "каталог оборудования умный дом, акустика Алматы, датчики BMS, слаботочное оборудование Казахстан, купить акустику, INPAR",
+    url: "https://inpar.kz/products"
+  });
 });
 
 const displayProducts = computed(() => productStore.products || []);

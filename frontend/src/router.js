@@ -24,6 +24,9 @@ const AdminProductForm = defineAsyncComponent(
 const ProjectsPage = defineAsyncComponent(
   () => import("./pages/ProjectsPage.vue"),
 );
+const ServiceDetailPage = defineAsyncComponent(
+  () => import("./pages/ServiceDetailPage.vue"),
+);
 const NotFoundPage = defineAsyncComponent(
   () => import("./pages/NotFoundPage.vue"),
 );
@@ -51,6 +54,11 @@ const routes = [
     path: "/products/:id",
     name: "ProductDetail",
     component: ProductDetailPage,
+  },
+  {
+    path: "/services/:slug",
+    name: "ServiceDetail",
+    component: ServiceDetailPage,
   },
   {
     path: "/admin/login",

@@ -7,6 +7,7 @@ import { ArrowLeft, ShoppingCart, Tag, MessageCircle } from "lucide-vue-next";
 import Navbar from "../components/Navbar.vue";
 import api from "../services/api";
 import { formatNiceKztPrice, calculateKztFromUsd } from "../services/price";
+import { updateSEO } from "../utils/seo";
 
 const route = useRoute();
 const router = useRouter();
@@ -36,6 +37,51 @@ onMounted(async () => {
   await Promise.all([rateRequest, productRequest]);
 
   isPageReady.value = true;
+
+  if (product.value) {
+    const p = product.value;
+    const title = `${p.name} — Купить в Алматы, цена, характеристики | INPAR.KZ`;
+    const desc = p.description ? `${p.description.slice(0, 150)}...` : `Купить ${p.name} в Алматы по цене ₸${productPriceKzt.value}. Поставки, гарантия, монтаж от компании INPAR.`;
+    const img = p.main_image || "https://inpar.kz/assets/sticker-CGlHhmMq.png";
+
+    updateSEO({
+      title,
+      description: desc,
+      keywords: `${p.name}, купить ${p.name}, ${p.sku || ''}, звуковое оборудование Алматы, автоматизация Казахстан`,
+      image: img,
+      url: window.location.href,
+      jsonLd: [
+        {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "name": p.name,
+          "image": [img],
+          "description": p.description || p.name,
+          "sku": p.sku || `INPAR-${p.id}`,
+          "offers": {
+            "@type": "Offer",
+            "url": window.location.href,
+            "priceCurrency": "KZT",
+            "price": String(productPriceKzt.value).replace(/[^0-9]/g, ""),
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "INPAR.KZ"
+            }
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://inpar.kz/" },
+            { "@type": "ListItem", "position": 2, "name": "Каталог", "item": "https://inpar.kz/products" },
+            { "@type": "ListItem", "position": 3, "name": p.name, "item": window.location.href }
+          ]
+        }
+      ]
+    });
+  }
 });
 
 const product = computed(() => productStore.currentProduct);

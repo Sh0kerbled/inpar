@@ -7,9 +7,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.decorators.csrf import csrf_exempt
 
+from api.seo_views import sitemap_xml, robots_txt, bot_render_view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('sitemap.xml', sitemap_xml, name='sitemap'),
+    path('robots.txt', robots_txt, name='robots'),
+    path('seo/bot-render/', bot_render_view, name='bot_render'),
 ]
 
 if settings.DEBUG:

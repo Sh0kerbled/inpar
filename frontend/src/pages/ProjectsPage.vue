@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { updateSEO } from "../utils/seo";
 import {
   Building2,
   Flame,
@@ -42,6 +43,15 @@ import astanamotors from "./img/image 21.svg";
 import Navbar from "@/components/Navbar.vue";
 
 const { t } = useI18n();
+
+onMounted(() => {
+  updateSEO({
+    title: "Реализованные проекты — Отели, ТРЦ, бизнес-центры | INPAR.KZ",
+    description: "Портфолио завершенных объектов компании INPAR: автоматизация зданий, пожарная безопасность, профессиональный звук и СКУД в Казахстане и СНГ.",
+    keywords: "проекты умный дом, автоматизация отелей Алматы, слаботочные системы объекты, портфолио INPAR",
+    url: "https://inpar.kz/projects"
+  });
+});
 
 const activeFilter = ref("all");
 
