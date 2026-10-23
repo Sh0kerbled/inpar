@@ -2,10 +2,12 @@
  * SEO helper for dynamic meta tags and JSON-LD schema injection in Vue 3 SPA
  */
 
+const BASE_URL = "https://inpar.kz";
+
 const DEFAULT_META = {
-  title: "INPAR.KZ — Системная интеграция, Умный дом KNX и BMS в Алматы",
-  description: "Компания INPAR.KZ с 2014 года выполняет проектирование, монтаж и интеграцию слаботочных систем, автоматизации зданий (BMS), пожарной безопасности и умных домов KNX в Казахстане.",
-  keywords: "умный дом Алматы, KNX Казахстан, BMS диспетчеризация, пожарная сигнализация, видеонаблюдение, СКУД, профессиональный звук, слаботочные системы",
+  title: "INPAR.KZ — Слаботочные системы, Индустриальная автоматизация, MCC, DDC и Умный дом в Алматы",
+  description: "Компания INPAR.KZ с 2014 года выполняет проектирование, монтаж и интеграцию слаботочных систем, автоматизации зданий (BMS), индустриальной автоматизации, шкафов MCC/DDC и умных домов KNX в Казахстане.",
+  keywords: "слаботочные системы Алматы, индустриальные автоматизации, шкафы MCC, контроллеры DDC, электрические шкафы Алматы, умный дом KNX Казахстан",
   image: "https://inpar.kz/assets/sticker-CGlHhmMq.png",
   url: "https://inpar.kz"
 };
@@ -20,6 +22,18 @@ function ensureMetaTag(name, attr = "name") {
   return element;
 }
 
+function ensureLinkTag(rel, hreflang = null) {
+  let selector = hreflang ? `link[rel="${rel}"][hreflang="${hreflang}"]` : `link[rel="${rel}"]`;
+  let element = document.querySelector(selector);
+  if (!element) {
+    element = document.createElement("link");
+    element.setAttribute("rel", rel);
+    if (hreflang) element.setAttribute("hreflang", hreflang);
+    document.head.appendChild(element);
+  }
+  return element;
+}
+
 export function updateSEO({
   title = DEFAULT_META.title,
   description = DEFAULT_META.description,
@@ -27,10 +41,13 @@ export function updateSEO({
   image = DEFAULT_META.image,
   url = window.location.href,
   type = "website",
+  lang = "ru",
+  path = "",
   jsonLd = null
 } = {}) {
-  // 1. Update Title
+  // 1. Update Title and HTML lang attribute
   document.title = title;
+  document.documentElement.lang = lang === "kz" ? "kk" : (lang === "en" ? "en" : "ru");
 
   // 2. Standard Meta Tags
   ensureMetaTag("description").setAttribute("content", description);
@@ -51,15 +68,20 @@ export function updateSEO({
   ensureMetaTag("twitter:image").setAttribute("content", image);
 
   // 5. Canonical Link
-  let canonical = document.querySelector('link[rel="canonical"]');
-  if (!canonical) {
-    canonical = document.createElement("link");
-    canonical.setAttribute("rel", "canonical");
-    document.head.appendChild(canonical);
-  }
-  canonical.setAttribute("href", url);
+  ensureLinkTag("canonical").setAttribute("href", url);
 
-  // 6. JSON-LD Structured Data
+  // 6. Hreflang Alternates (RU, KK, EN, x-default)
+  let clean = path.replace(/^\/(kz|en)/, "").replace(/^\/+/, "");
+  let ruUrl = clean ? `${BASE_URL}/${clean}` : `${BASE_URL}/`;
+  let kzUrl = clean ? `${BASE_URL}/kz/${clean}` : `${BASE_URL}/kz`;
+  let enUrl = clean ? `${BASE_URL}/en/${clean}` : `${BASE_URL}/en`;
+
+  ensureLinkTag("alternate", "ru").setAttribute("href", ruUrl);
+  ensureLinkTag("alternate", "kk").setAttribute("href", kzUrl);
+  ensureLinkTag("alternate", "en").setAttribute("href", enUrl);
+  ensureLinkTag("alternate", "x-default").setAttribute("href", ruUrl);
+
+  // 7. JSON-LD Structured Data
   let script = document.getElementById("seo-schema-jsonld");
   if (!script) {
     script = document.createElement("script");

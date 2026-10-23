@@ -33,30 +33,30 @@ const NotFoundPage = defineAsyncComponent(
 
 const routes = [
   {
-    path: "/",
+    path: "/:lang(kz|en)?",
     name: "Home",
     component: HomePage,
     meta: { layout: "landing" },
   },
   {
-    path: "/projects",
+    path: "/:lang(kz|en)?/projects",
     name: "Projects",
     component: ProjectsPage,
     meta: { layout: "landing" },
   },
   {
-    path: "/products",
+    path: "/:lang(kz|en)?/products",
     name: "Products",
     component: ProductsPage,
     meta: { layout: "app" },
   },
   {
-    path: "/products/:id",
+    path: "/:lang(kz|en)?/products/:id",
     name: "ProductDetail",
     component: ProductDetailPage,
   },
   {
-    path: "/services/:slug",
+    path: "/:lang(kz|en)?/services/:slug",
     name: "ServiceDetail",
     component: ServiceDetailPage,
   },
@@ -115,6 +115,18 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
+
+  // Sync language from URL parameter
+  if (to.params.lang && ["kz", "en"].includes(to.params.lang)) {
+    if (window.i18n) {
+      window.i18n.global.locale.value = to.params.lang;
+    }
+  } else if (!to.path.startsWith("/admin")) {
+    const stored = localStorage.getItem("user-locale") || "ru";
+    if (window.i18n) {
+      window.i18n.global.locale.value = stored;
+    }
+  }
 
   if (to.meta.requiresAuth) {
     if (authStore.isAuthenticated && authStore.isAdmin) {

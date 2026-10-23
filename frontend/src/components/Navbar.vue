@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
-
-const { t, locale } = useI18n();
+import { useRoute, useRouter } from "vue-router";
+const route = useRoute();
 const router = useRouter();
 
 const scrolled = ref(false);
@@ -11,6 +10,12 @@ const menuOpen = ref(false);
 
 const handleScroll = () => {
   scrolled.value = window.scrollY > 20;
+};
+
+const getLangLink = (lang) => {
+  const cleanPath = route.path.replace(/^\/(kz|en)/, "") || "/";
+  if (lang === "ru") return cleanPath;
+  return `/${lang}${cleanPath === "/" ? "" : cleanPath}`;
 };
 
 const setLocale = (lang) => {
@@ -68,9 +73,10 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
         <div
           class="flex items-center gap-1 ml-2 border-l border-[#333842] pl-4"
         >
-          <button
+          <router-link
             v-for="lang in langs"
             :key="lang"
+            :to="getLangLink(lang)"
             @click="setLocale(lang)"
             :class="[
               'text-xs tracking-widest uppercase px-2 py-1 transition-colors duration-200',
@@ -80,7 +86,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
             ]"
           >
             {{ lang }}
-          </button>
+          </router-link>
         </div>
       </div>
 
@@ -134,10 +140,11 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
       </router-link>
 
       <div class="flex items-center gap-2 pt-2 border-t border-[#333842]">
-        <button
+        <router-link
           v-for="lang in langs"
           :key="lang"
-          @click="setLocale(lang)"
+          :to="getLangLink(lang)"
+          @click="setLocale(lang); menuOpen = false"
           :class="[
             'text-xs tracking-widest uppercase px-2 py-1 transition-colors duration-200',
             locale === lang
@@ -146,7 +153,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
           ]"
         >
           {{ lang }}
-        </button>
+        </router-link>
       </div>
     </div>
   </nav>
