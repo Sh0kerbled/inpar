@@ -2164,6 +2164,12 @@ def bot_render_view(request):
             "en": "Order via WhatsApp"
         }.get(lang, "Order via WhatsApp")
 
+        rel_slugs = _get_related_services_for_product(product.name, product.sku)
+        rel_links_html = "".join([
+            f'<a href="{BASE_URL}{prefix}/services/{s}" style="display: inline-block; margin: 4px 6px 4px 0; padding: 6px 12px; background: #252932; border: 1px solid #333842; border-radius: 6px; color: #60A5FA; text-decoration: none; font-size: 13px;">{html.escape(SERVICES_DATA[s]["badge"].get(lang, SERVICES_DATA[s]["badge"]["ru"]))}</a>'
+            for s in rel_slugs if s in SERVICES_DATA
+        ])
+
         body_content = f"""
         <span class="badge">Каталог оборудования / Products</span>
         <h1>{html.escape(product.name)}</h1>
@@ -2175,6 +2181,9 @@ def bot_render_view(request):
 
         <h2>Описание товара</h2>
         <p>{html.escape(product.description or 'Оборудование для системной интеграции, слаботочных систем и автоматизации.')}</p>
+
+        {f'''<h2>Применяется в инженерных решениях</h2>
+        <div style="margin-bottom: 24px;">{rel_links_html}</div>''' if rel_links_html else ''}
 
         {f'''<h2>Характеристики</h2>
         <table class="table">
