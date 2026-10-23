@@ -128,6 +128,52 @@ const whatsappLink = computed(() => {
 
   return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
 });
+
+const relatedServices = computed(() => {
+  if (!product.value) return [];
+  const name = (product.value.name || "").toLowerCase();
+  const sku = (product.value.sku || "").toLowerCase();
+  const text = `${name} ${sku}`;
+  const list = [];
+  if (text.includes("obt") || text.includes("колонк") || text.includes("динамик") || text.includes("усилител") || text.includes("акустик")) {
+    list.push(
+      { slug: "sound-and-light", title: "Профессиональный звук и свет" },
+      { slug: "fire-safety", title: "Системы оповещения СОУЭ" },
+      { slug: "low-voltage-systems", title: "Слаботочные системы" }
+    );
+  } else if (text.includes("lunatek") || text.includes("инвертор") || text.includes("стабилизатор") || text.includes("sunark") || text.includes("аккум") || text.includes("батаре")) {
+    list.push(
+      { slug: "electrical-cabinets", title: "Электрошкафы и системы бесперебойного питания" },
+      { slug: "mcc-cabinets", title: "Шкафы управления MCC" },
+      { slug: "system-integration", title: "Комплексная системная интеграция" }
+    );
+  } else if (text.includes("dahua") || text.includes("dhi") || text.includes("контроллер") || text.includes("face") || text.includes("sprut") || text.includes("замок") || text.includes("кнопка")) {
+    list.push(
+      { slug: "cctv-access-control", title: "СКУД и Видеонаблюдение" },
+      { slug: "low-voltage-systems", title: "Слаботочные системы под ключ" },
+      { slug: "smart-home-knx", title: "Умный дом KNX" }
+    );
+  } else if (text.includes("temco") || text.includes("датчик") || text.includes("wts") || text.includes("dts") || text.includes("psn")) {
+    list.push(
+      { slug: "ddc-automation", title: "Шкафы автоматики ОВиК DDC" },
+      { slug: "bms-dispatching", title: "Диспетчеризация зданий BMS" },
+      { slug: "industrial-automation", title: "Индустриальная автоматизация" }
+    );
+  } else if (text.includes("шкаф") || text.includes("щит")) {
+    list.push(
+      { slug: "electrical-cabinets", title: "Электрические шкафы ВРУ и ГРЩ" },
+      { slug: "mcc-cabinets", title: "Шкафы управления двигателями MCC" },
+      { slug: "ddc-automation", title: "Шкафы автоматики DDC" }
+    );
+  } else {
+    list.push(
+      { slug: "low-voltage-systems", title: "Слаботочные системы" },
+      { slug: "electrical-cabinets", title: "Электрощитовое производство" },
+      { slug: "system-integration", title: "Системная интеграция" }
+    );
+  }
+  return list;
+});
 </script>
 
 <template>
@@ -164,13 +210,13 @@ const whatsappLink = computed(() => {
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div
-            class="aspect-square bg-[#1A1D23] border border-[#333842] overflow-hidden"
+            class="aspect-square bg-white border border-[#333842] rounded-2xl p-6 flex items-center justify-center overflow-hidden shadow-2xl"
           >
             <img
               v-if="product.main_image"
               :src="product.main_image"
               :alt="product.name"
-              class="w-full h-full object-cover"
+              class="max-w-full max-h-full object-contain transition-transform duration-300 hover:scale-105"
             />
             <div
               v-else
@@ -310,6 +356,24 @@ const whatsappLink = computed(() => {
                 <span class="text-sm text-[#E8E9ED] font-light">{{
                   char.value
                 }}</span>
+              </div>
+            </div>
+
+            <!-- Применяется в инженерных решениях (Семантическая перелинковка) -->
+            <div v-if="relatedServices.length" class="mt-8 pt-8 border-t border-[#333842]">
+              <p class="text-xs text-[#9BA1AB] tracking-widest uppercase font-light mb-3">
+                Применяется в инженерных решениях
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <router-link
+                  v-for="s in relatedServices"
+                  :key="s.slug"
+                  :to="`/services/${s.slug}`"
+                  class="px-3.5 py-1.5 rounded-lg border border-[#333842] hover:border-[#3B82F6] bg-[#1A1D23] hover:bg-[#252932] text-xs text-[#60A5FA] transition-all flex items-center gap-1.5"
+                >
+                  <span>{{ s.title }}</span>
+                  <span>→</span>
+                </router-link>
               </div>
             </div>
           </div>

@@ -33,6 +33,70 @@ const WHATSAPP_PHONE = "77019954217";
 // 12 направлений инжиниринга
 const servicesMap = {
   "mcc-cabinets": {
+    knowsAbout: [{"name": "Motor Control Center", "sameAs": "https://www.wikidata.org/wiki/Q175185"}, {"name": "Variable-frequency drive", "sameAs": "https://www.wikidata.org/wiki/Q1055745"}, {"name": "Motor soft starter", "sameAs": "https://www.wikidata.org/wiki/Q1760467"}],
+    problemsRu: [
+      {
+            "problem": "Частые гидроудары в трубопроводах и разрушение рабочих колес насосов при прямом пуске от сети.",
+            "solution": "Установка шкафов MCC с частотными преобразователями (ЧРП) и устройствами плавного пуска (УПП) с S-образной кривой разгона.",
+            "benefit": "Полное устранение гидроударов, продление ресурса насосов в 3–5 раз и защита труб от прорывов."
+      },
+      {
+            "problem": "Сгорание электродвигателей из-за перекоса фаз, просадок напряжения или сухого хода скважины.",
+            "solution": "Интеллектуальное микропроцессорное реле защиты и датчики уровня с автоматическим вводом резервного насоса (АВР).",
+            "benefit": "100% защита мотора от перегрева и бесперебойная подача воды 24/7."
+      },
+      {
+            "problem": "Высокие счета за электроэнергию из-за постоянной работы двигателей на максимальных оборотах (50 Гц).",
+            "solution": "Автоматическое ПИД-регулирование частоты вращения в зависимости от фактического расхода и давления.",
+            "benefit": "Экономия электроэнергии от 25% до 40% и снижение пусковых токов в 6 раз."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Сорғыларды тікелей қосқанда құбырлардағы гидросоққылар және жабдықтың тез істен шығуы.",
+            "solution": "Жиілік түрлендіргіштері (ЖТ) мен жұмсақ іске қосқыштары бар MCC шкафтарын орнату.",
+            "benefit": "Гидросоққыларды толық жою, сорғылардың қызмет ету мерзімін 3–5 есеге дейін ұзарту."
+      },
+      {
+            "problem": "Фазалардың жоғалуынан немесе сорғының кептелуінен электр қозғалтқыштарының күйіп кетуі.",
+            "solution": "Фазаларды бақылайтын микропроцессорлық релелер және құрғақ жүрістен автоматты қорғаныс.",
+            "benefit": "Қозғалтқыштарды 100% апаттан сақтау және резервтік сорғыға бірден автоматты ауысу."
+      },
+      {
+            "problem": "Сорғылардың үнемі толық қуатта жұмыс істеуінен электр қуатына артық шығындар.",
+            "solution": "Қысым датчиктерінің мәніне сәйкес қозғалтқыш айналымын автоматты реттеу (ПИД-реттеу).",
+            "benefit": "Электр энергиясын 35%-ға дейін үнемдеу."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Severe hydraulic water hammer and rapid mechanical wear during direct-on-line (DOL) pump starts.",
+            "solution": "Custom MCC cabinets featuring Variable Frequency Drives (VFD) and soft starters with smooth S-ramp curves.",
+            "benefit": "Complete elimination of pipe pressure spikes, extending pump lifespan by 300-500%."
+      },
+      {
+            "problem": "Motor burnouts caused by voltage phase loss, unbalance, or dry-run impeller jamming.",
+            "solution": "Microprocessor motor protection relays, PTC thermistor monitoring, and automatic duty/standby pump rotation.",
+            "benefit": "Zero motor failures and 24/7 continuous water and utility service."
+      },
+      {
+            "problem": "Excessive electrical power bills from motors constantly running at fixed maximum speed.",
+            "solution": "Closed-loop PID pressure feedback modulation automatically matching motor output to actual process demand.",
+            "benefit": "Up to 35-40% reduction in electricity consumption and fast return on investment."
+      }
+],
+    faqsKz: [
+      {
+            "q": "MCC шкафтары сорғыларды қалай қорғайды?",
+            "a": "Жиілік түрлендіргіш қозғалтқышты бірқалыпты іске қосады, құбырлардағы қысымның күрт көтерілуін жояды және фазалардың қисаюын бақылайды."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Can your MCC panels integrate with third-party BMS or SCADA platforms?",
+            "a": "Yes, we integrate Modbus RTU/TCP, BACnet, and Profinet communication cards to stream operating currents, pressures, and diagnostic fault codes to any supervisory station."
+      }
+],
     slug: "mcc-cabinets",
     icon: Layers,
     color: "#3B82F6",
@@ -80,6 +144,60 @@ const servicesMap = {
   },
 
   "ddc-automation": {
+    knowsAbout: [{"name": "Direct digital control", "sameAs": "https://www.wikidata.org/wiki/Q5271878"}, {"name": "HVAC control system", "sameAs": "https://www.wikidata.org/wiki/Q5635832"}, {"name": "Building automation", "sameAs": "https://www.wikidata.org/wiki/Q629239"}],
+    problemsRu: [
+      {
+            "problem": "Замерзание и разрыв медных трубок водяного калорифера приточной вентиляции в зимний период.",
+            "solution": "3-контурная аппаратная защита DDC: капиллярный термостат аварии, датчик температуры обратной воды и автопрогрев теплообменника перед открытием воздушной заслонки.",
+            "benefit": "100% гарантия сохранности калорифера от разморозки даже при морозах до -40°C."
+      },
+      {
+            "problem": "Нестабильный микроклимат в помещениях: духота, сквозняки или постоянные скачки температуры.",
+            "solution": "DDC контроллеры с адаптивным ПИД-регулированием и датчиками CO2, влажности и комнатной температуры.",
+            "benefit": "Идеальный комфортный микроклимат с точностью ±0.5°C и экономия тепловой энергии."
+      },
+      {
+            "problem": "Служба эксплуатации не знает о загрязнении фильтров или обрыве приводного ремня вентилятора.",
+            "solution": "Установка прецизионных реле перепада давления с выводом предупреждений на графическую панель шкафа DDC.",
+            "benefit": "Своевременная замена расходников без аварийной остановки системы воздухообмена."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Қыста қатты аяздарда желдету калориферінің суы қатып, құбырларының жарылуы.",
+            "solution": "3 деңгейлі DDC қорғанысы: капиллярлық термостат, қайту суының температурасын бақылау және алдын ала жылыту циклі.",
+            "benefit": "Калорифердің қатып қалуынан 100% сенімді қорғаныс."
+      },
+      {
+            "problem": "Ғимараттағы ауаның бұзылуы немесе температураның үнемі ауытқуы.",
+            "solution": "CO2 және температура датчиктерімен жабдықталған ПИД-реттегіш DDC контроллерлері.",
+            "benefit": "Бөлмеде тұрақты жайлы микроклимат сақтау."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Catastrophic winter heating coil freeze bursts caused by power outages or circulation pump failures.",
+            "solution": "Triple-redundant DDC frost protection: capillary safety freeze stat, return water temperature monitoring, and pre-heat damper interlocks.",
+            "benefit": "100% prevention of coil freezing down to -40°C ambient temperatures."
+      },
+      {
+            "problem": "Inconsistent indoor air quality, stuffiness, and drafty temperature swings.",
+            "solution": "Adaptive PID DDC controllers utilizing indoor IAQ, humidity, and CO2 sensor feedback.",
+            "benefit": "Superior indoor comfort with ±0.5°C thermal stability and reduced thermal utility bills."
+      }
+],
+    faqsKz: [
+      {
+            "q": "DDC жүйесі калориферді қатып қалудан қалай сақтайды?",
+            "a": "Жүйе кері қайтқан су температурасын үнемі бақылап, апаттық жағдайда сыртқы ауа қақпағын жауып, жылу клапанын толық ашады."
+      }
+],
+    faqsEn: [
+      {
+            "q": "How does DDC protect against coil freeze during utility power loss?",
+            "a": "Spring-return damper actuators instantly close against incoming sub-zero air while hot water modulating valves default to 100% open."
+      }
+],
     slug: "ddc-automation",
     icon: Cpu,
     color: "#B8A276",
@@ -124,6 +242,60 @@ const servicesMap = {
   },
 
   "electrical-cabinets": {
+    knowsAbout: [{"name": "Electric switchboard", "sameAs": "https://www.wikidata.org/wiki/Q1141753"}, {"name": "Distribution board", "sameAs": "https://www.wikidata.org/wiki/Q1411516"}, {"name": "Automatic transfer switch", "sameAs": "https://www.wikidata.org/wiki/Q4826573"}],
+    problemsRu: [
+      {
+            "problem": "Претензии органов технадзора и энергонадзора к кустарной сборке щитов без маркировки, сертификатов и заводских паспортов.",
+            "solution": "Заводская сборка на собственном сертифицированном производстве по ГОСТ/МЭК с выдачей паспорта изделия и сертификатов соответствия Таможенного Союза.",
+            "benefit": "Беспрепятственная сдача объекта и подписание актов ввода в эксплуатацию с первого раза."
+      },
+      {
+            "problem": "Обесточивание критического оборудования (серверов, систем пожаротушения, лифтов) при аварии на главной линии.",
+            "solution": "Сборка шкафов АВР с логическим микропроцессорным контроллером и поддержкой автоматического пуска генератора.",
+            "benefit": "Бесшовное переключение на резервный ввод за 0.5–2 секунды без ущерба для бизнеса."
+      },
+      {
+            "problem": "Перегрев контактных групп, перекос фаз и риск пожара в щитовой из-за неправильного расчета сечений.",
+            "solution": "Точный расчет токов короткого замыкания, ошиновка электротехнической медью М1Т с тепловизионным контролем на стенде.",
+            "benefit": "Абсолютная пожаробезопасность электроустановки и безаварийная эксплуатация 15+ лет."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Техникалық қадағалаудың ретсіз жиналған қалқандарды қабылдамауы.",
+            "solution": "Зауыттық базада ГОСТ бойынша ресми сертификатпен жинау.",
+            "benefit": "Нысанды мемлекеттік органдарға бірінші реттен сәтті тапсыру."
+      },
+      {
+            "problem": "Электр қуаты сөнгенде нысанның жұмысы тоқтап қалуы.",
+            "solution": "Генераторды бірден іске қосатын сенімді АВР жүйесі.",
+            "benefit": "Нысанның үздіксіз 24/7 электрмен қамтылуы."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Authority and building inspector rejection due to uncertified hand-wired switchboards.",
+            "solution": "Certified manufacturing with full compliance passports, calculation sheets, and single-line verification.",
+            "benefit": "Seamless regulatory handover and fast commissioning approval."
+      },
+      {
+            "problem": "Costly downtime during utility blackouts.",
+            "solution": "Intelligent ATS cabinets with sub-second dual-line transfer and automated diesel generator sequencing.",
+            "benefit": "Zero interruption to mission-critical business equipment."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Қалқандарға ресми сертификат беріле ме?",
+            "a": "Иә, барлық қалқандар зауыттық сынақтан өтіп, ЕАС сәйкестік сертификатымен және паспортымен тапсырылады."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Do your switchgear panels include test documentation and warranty?",
+            "a": "Yes, every panel is supplied with full factory test reports, SLDs, serial passports, and an official multi-year warranty."
+      }
+],
     slug: "electrical-cabinets",
     icon: Box,
     color: "#EAB308",
@@ -168,6 +340,60 @@ const servicesMap = {
   },
 
   "industrial-automation": {
+    knowsAbout: [{"name": "Industrial control system", "sameAs": "https://www.wikidata.org/wiki/Q211050"}, {"name": "Programmable logic controller", "sameAs": "https://www.wikidata.org/wiki/Q173491"}, {"name": "SCADA", "sameAs": "https://www.wikidata.org/wiki/Q211050"}],
+    problemsRu: [
+      {
+            "problem": "Высокий процент брака и влияние человеческого фактора на качество выпускаемой продукции.",
+            "solution": "Внедрение автоматизированной системы управления (АСУ ТП) с точным соблюдением рецептур и технологических параметров.",
+            "benefit": "Снижение брака до нуля, рост производительности на 20–35% и стабильное качество каждой партии."
+      },
+      {
+            "problem": "Частые простои производственных линий из-за изношенной релейной автоматики и нехватки запчастей.",
+            "solution": "Реновация шкафов управления с установкой надежного ПЛК, сенсорной HMI панели и модулей удаленного ввода-вывода.",
+            "benefit": "Вторая жизнь оборудования с минимальными вложениями по сравнению с покупкой новой линии."
+      },
+      {
+            "problem": "Руководство не имеет объективных данных о реальной выработке, расходе сырья и причинах остановок цеха.",
+            "solution": "Разработка SCADA-системы с непрерывным сбором телеметрии, ведением журнала аварий и графиками трендов.",
+            "benefit": "Полная прозрачность технологического цикла и удаленный контроль со смартфона или ПК директора."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Адам факторынан болатын өнім ақаулары мен өндірістің кідіруі.",
+            "solution": "Рецептураларды қатаң сақтайтын ПЛК негізіндегі ТП ББЖ жүйесін енгізу.",
+            "benefit": "Өнім шығару көлемін 20–35% арттыру және ақауларды жою."
+      },
+      {
+            "problem": "Ескірген жабдықтың жиі сынуы және бөлшектерінің табылмауы.",
+            "solution": "Заманауи сенсорлы HMI экраны бар жаңа басқару шкафтарына көшіру.",
+            "benefit": "Жаңа станок сатып алмай-ақ желінің сенімділігін қалпына келтіру."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "High defect rates and inconsistent product quality caused by manual production processes.",
+            "solution": "Deploying turnkey PLC automation enforcing strict multi-stage recipe adherence and interlock safety.",
+            "benefit": "Defect reduction to near zero and overall throughput improvements of up to 35%."
+      },
+      {
+            "problem": "Recurring downtime due to unsupported legacy relay logic and obsolete spare parts.",
+            "solution": "Cabinet modernization with current-generation PLCs and color touch HMI displays.",
+            "benefit": "Restored equipment reliability without multi-million capital expenditures on new machinery."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Өндірісті тоқтатпай жаңғыртуға бола ма?",
+            "a": "Иә, біз жаңа шкафтарды алдын ала дайындап, ауыстыруды демалыс немесе техникалық үзілістер кезінде жүргіземіз."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Can you modernize machinery without stopping ongoing plant operations?",
+            "a": "Yes, we build and test new control enclosures offsite and perform rapid cutovers during planned maintenance shifts."
+      }
+],
     slug: "industrial-automation",
     icon: Factory,
     color: "#EF4444",
@@ -212,6 +438,60 @@ const servicesMap = {
   },
 
   "low-voltage-systems": {
+    knowsAbout: [{"name": "Extra-low voltage", "sameAs": "https://www.wikidata.org/wiki/Q1255858"}, {"name": "Structured cabling", "sameAs": "https://www.wikidata.org/wiki/Q1363294"}, {"name": "Access control", "sameAs": "https://www.wikidata.org/wiki/Q13410526"}, {"name": "Fire alarm system", "sameAs": "https://www.wikidata.org/wiki/Q1365389"}],
+    problemsRu: [
+      {
+            "problem": "Несколько разных субподрядчиков по интернету, камерам, пожарке и СКУД срывают сроки и перекладывают вину друг на друга.",
+            "solution": "Комплексный слаботочный подряд от INPAR: проектирование, кабельные трассы, серверные и пусконаладка в одних руках.",
+            "benefit": "Сдача объекта строго в срок, сокращение сметы за счет оптимизации трасс и единая гарантия на все системы."
+      },
+      {
+            "problem": "Падение скорости интернета, обрывы связи и хаос в кроссовых шкафах из-за неквалифицированной прокладки кабелей.",
+            "solution": "Монтаж сертифицированной СКС с маркировкой каждого порта и проверкой приборами Fluke Networks.",
+            "benefit": "Стабильная гигабитная сеть без скрытых затуханий и аккуратная серверная комната."
+      },
+      {
+            "problem": "Несанкционированный доступ посторонних лиц и отсутствие дисциплины учета рабочего времени сотрудников.",
+            "solution": "Внедрение сетевого СКУД с Face-ID терминалами, шлюзовыми турникетами и отчетами опозданий в 1С.",
+            "benefit": "Полная безопасность объекта и прозрачная трудовая дисциплина персонала."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Әртүрлі мердігерлердің келіспеушілігі салдарынан нысанның кешігуі.",
+            "solution": "INPAR компаниясынан бірыңғай кілтке дейін кешенді монтаж.",
+            "benefit": "Нысанды уақытында тапсыру, кабелдік трассаларды оңтайландыру және бірыңғай кепілдік."
+      },
+      {
+            "problem": "Сервердегі ретсіздік және интернеттің баяу жұмыс істеуі.",
+            "solution": "Кәсіби СКС құру және әрбір портты таңбалау.",
+            "benefit": "Жоғары жылдамдықты сенімді байланыс."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Coordination disputes and delays caused by juggling separate contractors for cameras, internet, and alarms.",
+            "solution": "All-in-one integrated ELV engineering by INPAR with consolidated cable pathways and single-point responsibility.",
+            "benefit": "On-time project delivery, clean architecture, and unified long-term warranty."
+      },
+      {
+            "problem": "Network bottlenecks and messy telecom racks causing continuous business downtime.",
+            "solution": "Certified structured cabling with laser port tagging and Fluke Networks certification.",
+            "benefit": "Flawless gigabit speeds, zero packet drop, and orderly patch distribution."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Қандай нысандармен жұмыс істейсіздер?",
+            "a": "Кеңселер, қоймалар, логистикалық орталықтар, бизнес-орталықтар, зауыттар мен көпқабатты тұрғын үй кешендері."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Do you provide as-built documentation for building commissioning authorities?",
+            "a": "Yes, we produce complete as-built CAD drawings, cable schedules, Fluke test certificates, and compliance declarations."
+      }
+],
     slug: "low-voltage-systems",
     icon: Network,
     color: "#06B6D4",
@@ -256,6 +536,60 @@ const servicesMap = {
   },
 
   "smart-home-knx": {
+    knowsAbout: [{"name": "KNX (standard)", "sameAs": "https://www.wikidata.org/wiki/Q1889"}, {"name": "Home automation", "sameAs": "https://www.wikidata.org/wiki/Q2818960"}, {"name": "Lighting control system", "sameAs": "https://www.wikidata.org/wiki/Q1842844"}],
+    problemsRu: [
+      {
+            "problem": "Беспроводные системы (Wi-Fi, Zigbee, Tuya) постоянно зависают, теряют датчики и зависят от китайских облаков.",
+            "solution": "Проводная шинная система KNX с децентрализованной логикой европейских брендов (ABB, Jung, Zennio, Schneider).",
+            "benefit": "Безупречная работа более 20 лет без сбоев, полная автономность и независимость от интернета."
+      },
+      {
+            "problem": "Стена из десятка разномастных выключателей, термостатов и пультов кондиционеров, портящих дизайнерский интерьер.",
+            "solution": "Замена всего ряда термостатов и пультов на единый дизайнерский сенсорный выключатель KNX с дисплеем.",
+            "benefit": "Элегантная минималистичная эстетика интерьера и интуитивное управление всеми функциями комнаты с одной панели."
+      },
+      {
+            "problem": "Опасения протечки воды, забытого утюга или оставленного освещения при отъезде из дома.",
+            "solution": "Сценарий 'Я ушел': отключение всех некритичных потребителей в одно касание и автоматическое перекрытие кранов при аварии.",
+            "benefit": "100% уверенность в безопасности жилья и предотвращение ущерба от затопления."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Сымсыз құрылғылардың үнемі байланысты жоғалтуы және батареяларын ауыстыру әбігері.",
+            "solution": "Сенімді сымды KNX шинасы (ABB, Zennio, Jung еуропалық брендтері).",
+            "benefit": "Батареясыз, байланыс үзілмейтін ондаған жылдар бойғы тұрақты жұмыс."
+      },
+      {
+            "problem": "Қабырғадағы көптеген бөлек термостаттар мен қосқыштардың интерьерді бұзуы.",
+            "solution": "Барлық функцияларды бір стильді KNX шыны сенсорлы панеліне біріктіру.",
+            "benefit": "Премиум дизайн және үйді бір түймемен ыңғайлы басқару."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Flimsy consumer wireless smart home gear (Wi-Fi/Zigbee) crashing, losing connectivity, and depending on foreign cloud servers.",
+            "solution": "Industrial-grade hardwired KNX bus topology utilizing decentralized hardware from premier European manufacturers (ABB, Jung, Zennio).",
+            "benefit": "Decades of bulletproof operational stability, complete privacy, and zero Wi-Fi network congestion."
+      },
+      {
+            "problem": "Cluttered wall surfaces packed with competing thermostats, AC controllers, and light switches.",
+            "solution": "Consolidating all functions into a single architectural glass KNX keypad featuring integrated temperature sensing.",
+            "benefit": "Uncluttered, elegant interior aesthetics and intuitive room control."
+      }
+],
+    faqsKz: [
+      {
+            "q": "KNX Ақылды үйінің қарапайым жүйелерден айырмашылығы неде?",
+            "a": "Бұл еуропалық өндірістік стандарт. Ол интернетке немесе орталық серверге тәуелді емес, сондықтан ешқашан ілінбейді және өте ұзақ қызмет етеді."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Can I control my KNX home using Apple HomeKit and Siri?",
+            "a": "Yes, we integrate certified bidirectional bridges allowing native control via Apple HomeKit, Siri voice commands, and Apple Watch widgets."
+      }
+],
     slug: "smart-home-knx",
     icon: Home,
     color: "#3B82F6",
@@ -300,6 +634,45 @@ const servicesMap = {
   },
 
   "bms-dispatching": {
+    knowsAbout: [{"name": "Building management system", "sameAs": "https://www.wikidata.org/wiki/Q629239"}, {"name": "BACnet", "sameAs": "https://www.wikidata.org/wiki/Q795493"}, {"name": "Modbus", "sameAs": "https://www.wikidata.org/wiki/Q1130095"}],
+    problemsRu: [
+      {
+            "problem": "Инженерная служба не знает о поломке насоса, разморозке калорифера или утечке воды до жалоб арендаторов.",
+            "solution": "Централизованная система диспетчеризации BMS с непрерывным опросом датчиков и мгновенными тревогами в Telegram дежурного инженера.",
+            "benefit": "Локализация и устранение инцидентов за минуты до причинения материального ущерба."
+      },
+      {
+            "problem": "Огромные коммунальные счета за отопление и электричество из-за круглосуточной работы инженерных систем на полную мощность.",
+            "solution": "Внедрение автоматических расписаний работы климата и освещения (будни/выходные, рабочие/нерабочие часы).",
+            "benefit": "Снижение расходов на энергоресурсы коммерческого здания на 20–30% ежегодно."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Апат болған кезде инженерлердің кеш хабардар болуы.",
+            "solution": "Диспетчерлік мониторинг және Telegram арқылы лезде ескерту.",
+            "benefit": "Апаттарды алғашқы минуттарда жедел жою."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Facility teams unaware of equipment failures until tenant comfort complaints escalate.",
+            "solution": "Continuous automated BMS telemetry streaming telemetry and instantaneous engineer notification.",
+            "benefit": "Proactive resolution of equipment malfunctions before tenant impact or structural damage occurs."
+      }
+],
+    faqsKz: [
+      {
+            "q": "BMS жүйесі қандай үнем береді?",
+            "a": "Жылыту мен электр қуатын тек қажет уақытта тұтыну арқылы коммуналдық шығындарды 20-30% төмендетеді."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Can legacy chillers and third-party panels be bridged into the BMS?",
+            "a": "Yes, we integrate open standard protocol gateways (BACnet, Modbus, SNMP) to bring multi-vendor hardware into a unified operator workstation."
+      }
+],
     slug: "bms-dispatching",
     icon: Building2,
     color: "#B8A276",
@@ -341,6 +714,40 @@ const servicesMap = {
   },
 
   "fire-safety": {
+    knowsAbout: [{"name": "Fire alarm system", "sameAs": "https://www.wikidata.org/wiki/Q1365389"}, {"name": "Smoke detector", "sameAs": "https://www.wikidata.org/wiki/Q189578"}],
+    problemsRu: [
+      {
+            "problem": "Риск штрафов, приостановки деятельности объекта или отказа ввода в эксплуатацию инспекцией ДЧС.",
+            "solution": "Лицензированный монтаж сертифицированного оборудования строго по СН РК с полным пакетом исполнительных актов.",
+            "benefit": "Безупречная приемка объекта инспекцией пожарного надзора с первого раза."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "ТЖД инспекциясының айыппұл салу немесе нысанды қабылдамау қаупі.",
+            "solution": "ҚР нормаларына сай ресми лицензиямен сапалы монтаждау.",
+            "benefit": "Нысанды өрт қауіпсіздігі органдарына кедергісіз тапсыру."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Risk of regulatory shutdown and failure to pass mandatory state fire safety inspections.",
+            "solution": "Turnkey licensed installation of certified fire equipment with comprehensive testing protocols.",
+            "benefit": "Guaranteed first-time inspection acceptance by emergency authorities."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Құжаттарды ТЖД-ға тапсыруға көмектесесіздер ме?",
+            "a": "Иә, толық атқарушылық сызбалар мен актілерді дайындап, инспекцияның қабылдауына дейін сүйемелдейміз."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Do you hold state licenses for fire safety engineering?",
+            "a": "Yes, INPAR holds all required state certifications and licensing for fire safety and emergency evacuation engineering in Kazakhstan."
+      }
+],
     slug: "fire-safety",
     icon: ShieldAlert,
     color: "#D00000",
@@ -378,6 +785,40 @@ const servicesMap = {
   },
 
   "cctv-access-control": {
+    knowsAbout: [{"name": "Closed-circuit television", "sameAs": "https://www.wikidata.org/wiki/Q215705"}, {"name": "Biometrics", "sameAs": "https://www.wikidata.org/wiki/Q178706"}, {"name": "Access control", "sameAs": "https://www.wikidata.org/wiki/Q13410526"}],
+    problemsRu: [
+      {
+            "problem": "Хищения на складе или в торговом зале из-за 'слепых зон' и плохого качества старых аналоговых камер.",
+            "solution": "Установка профессиональных IP-камер 4K с ультрашироким углом обзора, WDR и ночной цветной подсветкой (ColorVu/FullColor).",
+            "benefit": "100% покрытие территории и детализированное видео лиц и номеров даже в полной темноте."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Ескі камералардың сапасыздығынан түнде адамдар мен көлік нөмірлерінің көрінбеуі.",
+            "solution": "Түнгі түрлі-түсті көру жүйесі бар заманауи 4K IP-камераларды орнату.",
+            "benefit": "Нысанның тәулік бойы толық қауіпсіздігі."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Stock theft or unauthorized perimeter intrusions masked by blurry analog footage and coverage blind spots.",
+            "solution": "Deploying commercial 4K ultra-wide IP cameras with advanced true WDR and low-light color imaging.",
+            "benefit": "Crystal-clear evidential identification of faces and vehicle plates day and night."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Камераларға кепілдік беріле ме?",
+            "a": "Иә, біз орнататын барлық ресми жабдықтарға 1 жылдан 3 жылға дейін кепілдік және сервистік қолдау ұсынамыз."
+      }
+],
+    faqsEn: [
+      {
+            "q": "What equipment manufacturers do you install?",
+            "a": "We install enterprise-grade platforms from Dahua, Hikvision, Sigur, Perco, Came, and Uniview with manufacturer warranties."
+      }
+],
     slug: "cctv-access-control",
     icon: Cctv,
     color: "#A8ADB5",
@@ -414,6 +855,40 @@ const servicesMap = {
   },
 
   "sound-and-light": {
+    knowsAbout: [{"name": "Public address system", "sameAs": "https://www.wikidata.org/wiki/Q1340156"}, {"name": "Acoustics", "sameAs": "https://www.wikidata.org/wiki/Q82811"}],
+    problemsRu: [
+      {
+            "problem": "Плохая разборчивость речи, гул, эхо и неравномерная громкость в залах ресторанов или конференц-комнатах.",
+            "solution": "Компьютерное акустическое моделирование помещения, подбор диаграммы направленности колонок и точная настройка DSP-процессора.",
+            "benefit": "Кристально чистый звук, комфортный уровень громкости за каждым столом и отсутствие утомляемости гостей."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Залдағы жаңғырық пен дыбыстың бұзылуы.",
+            "solution": "Акустикалық есептеу жүргізу және DSP дыбыс процессорларын дәл баптау.",
+            "benefit": "Залдың әрбір нүктесінде таза және жағымды дыбыс."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Poor speech intelligibility, acoustic flutter echoes, and fatiguing sound levels in restaurants or halls.",
+            "solution": "Predictive acoustic mapping, targeted dispersion speaker selection, and calibrated DSP equalization.",
+            "benefit": "Warm, crystal-clear audio balance across every seating zone."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Каталогтағы OBT акустикасын көтерме бағамен сатып алуға бола ма?",
+            "a": "Иә, біз OBT жабдықтарын Қазақстан бойынша тікелей жеткізуші болып табыламыз және көтерме бағамен ұсынамыз."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Do you supply OBT commercial audio hardware listed in your catalog?",
+            "a": "Yes, INPAR is a direct distributor and integrator of certified OBT commercial audio products in Kazakhstan."
+      }
+],
     slug: "sound-and-light",
     icon: Speaker,
     color: "#B8A276",
@@ -450,6 +925,40 @@ const servicesMap = {
   },
 
   "networks-smatv": {
+    knowsAbout: [{"name": "Computer network", "sameAs": "https://www.wikidata.org/wiki/Q1301371"}, {"name": "Fiber-optic communication", "sameAs": "https://www.wikidata.org/wiki/Q162"}],
+    problemsRu: [
+      {
+            "problem": "Обрывы связи и низкая скорость корпоративной сети из-за некачественных скруток и перегибов кабеля.",
+            "solution": "Монтаж сертифицированной СКС с соблюдением радиусов изгиба и обязательным тестированием приборами Fluke Networks.",
+            "benefit": "Гарантированная гигабитная скорость передачи данных и отсутствие потерь пакетов."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Сервердегі ретсіздік және интернет жылдамдығының төмендеуі.",
+            "solution": "Кәсіби СКС құру және Fluke аспабымен тестілеу.",
+            "benefit": "Тұрақты жоғары жылдамдықты желі және реттелген сервер."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Network connection drops and packet loss caused by substandard wiring terminations.",
+            "solution": "Installing certified structured cabling using strict bend-radius rules and mandatory Fluke Networks qualification.",
+            "benefit": "Guaranteed gigabit throughput and zero downtime for mission-critical IT services."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Оптиканы дәнекерлеу қызметін көрсетесіздер ме?",
+            "a": "Иә, біз кәсіби жапондық дәнекерлеу аппараттарымен оптикалық кабельдерді сапалы дәнекерлейміз."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Do you provide Fluke test certification reports?",
+            "a": "Yes, every installed drop is verified with Fluke Networks DTX/DSX analyzers with complete PDF pass reports."
+      }
+],
     slug: "networks-smatv",
     icon: Network,
     color: "#A8ADB5",
@@ -486,6 +995,40 @@ const servicesMap = {
   },
 
   "system-integration": {
+    knowsAbout: [{"name": "Systems engineering", "sameAs": "https://www.wikidata.org/wiki/Q216353"}, {"name": "Systems integrator", "sameAs": "https://www.wikidata.org/wiki/Q3244837"}],
+    problemsRu: [
+      {
+            "problem": "Инженерные системы здания (вентиляция, чиллеры, котельная, пожарка, электрика) работают автономно, не синхронизированы и конфликтуют друг с другом.",
+            "solution": "Комплексная интеграция всех разделов от INPAR: сведение всех протоколов и систем в единую интеллектуальную цифровую экосистему.",
+            "benefit": "Слаженная работа всех инженерных узлов, снижение энергозатрат до 30% и полное отсутствие аварийных несогласованностей."
+      }
+],
+    problemsKz: [
+      {
+            "problem": "Ғимараттағы желдету, жылыту және өрт жүйелерінің бөлек жұмыс істеуі және келіспеушілігі.",
+            "solution": "Барлық жүйелерді INPAR арқылы біртұтас цифрлық экожүйеге біріктіру.",
+            "benefit": "Жүйелердің мінсіз үйлесімді жұмысы және шығындарды 30% үнемдеу."
+      }
+],
+    problemsEn: [
+      {
+            "problem": "Siloed building systems (HVAC, fire, chillers, power) operating independently and causing conflicting control cycles.",
+            "solution": "Comprehensive master system integration uniting all field equipment into a singular intelligent digital control plane.",
+            "benefit": "Flawless inter-system coordination, up to 30% reduction in utility waste, and zero contractor finger-pointing."
+      }
+],
+    faqsKz: [
+      {
+            "q": "Кешенді интеграция не үшін қажет?",
+            "a": "Ғимараттың барлық жүйелері өзара байланыста жұмыс істеп, апаттардың алдын алады және пайдалану шығындарын барынша азайтады."
+      }
+],
+    faqsEn: [
+      {
+            "q": "Why hire a Master Systems Integrator (MSI) instead of isolated trade contractors?",
+            "a": "An MSI guarantees overall functionality, eliminates interface disputes, streamlines pathways, and delivers a unified building intelligence platform with single-point accountability."
+      }
+],
     slug: "system-integration",
     icon: Combine,
     color: "#3B82F6",
@@ -553,6 +1096,30 @@ const serviceDesc = computed(() => {
   return s.descRu;
 });
 
+const serviceProblems = computed(() => {
+  const s = currentService.value;
+  if (!s) return [];
+  if (activeLang.value === "kz" && s.problemsKz && s.problemsKz.length) return s.problemsKz;
+  if (activeLang.value === "en" && s.problemsEn && s.problemsEn.length) return s.problemsEn;
+  return s.problemsRu || [];
+});
+
+const serviceFaqs = computed(() => {
+  const s = currentService.value;
+  if (!s) return [];
+  if (activeLang.value === "kz" && s.faqsKz && s.faqsKz.length) return s.faqsKz;
+  if (activeLang.value === "en" && s.faqsEn && s.faqsEn.length) return s.faqsEn;
+  return s.faqsRu || [];
+});
+
+const serviceStages = computed(() => {
+  const s = currentService.value;
+  if (!s) return [];
+  if (activeLang.value === "kz" && s.stagesKz && s.stagesKz.length) return s.stagesKz;
+  if (activeLang.value === "en" && s.stagesEn && s.stagesEn.length) return s.stagesEn;
+  return s.stagesRu || [];
+});
+
 const serviceFeatures = computed(() => {
   const s = currentService.value;
   if (!s) return [];
@@ -569,6 +1136,8 @@ const uiLabels = computed(() => {
     services: l === "kz" ? "Қызметтер" : (l === "en" ? "Services" : "Услуги"),
     capabilities: l === "kz" ? "Мүмкіндіктер" : (l === "en" ? "Capabilities" : "Возможности"),
     capabilitiesTitle: l === "kz" ? "Жүйені енгізуге не кіреді" : (l === "en" ? "System Scope & Deliverables" : "Что входит в реализацию системы"),
+    problems: l === "kz" ? "Мәселелер мен шешімдер" : (l === "en" ? "Challenges & Solutions" : "Задачи и решения"),
+    problemsTitle: l === "kz" ? "Нысандағы жиі кездесетін мәселелерді қалай шешеміз" : (l === "en" ? "How We Solve Field Engineering Challenges" : "Решаемые задачи и симптомы на объекте"),
     process: l === "kz" ? "Кезеңдер" : (l === "en" ? "Process" : "Процесс"),
     processTitle: l === "kz" ? "Жобалау және енгізу кезеңдері" : (l === "en" ? "Engineering & Deployment Stages" : "Этапы проектирования и внедрения"),
     faqTitle: l === "kz" ? "Жиі қойылатын сұрақтар" : (l === "en" ? "Frequently Asked Questions" : "Часто задаваемые вопросы"),
@@ -611,6 +1180,11 @@ const applySeo = () => {
       "@type": "Service",
       "name": serviceTitle.value,
       "description": serviceDesc.value,
+      "knowsAbout": (service.knowsAbout || []).map(k => ({
+        "@type": "DefinedTerm",
+        "name": k.name,
+        "sameAs": k.sameAs
+      })),
       "provider": {
         "@type": "LocalBusiness",
         "name": "INPAR.KZ",
@@ -625,6 +1199,15 @@ const applySeo = () => {
       },
       "areaServed": {"@type": "Country", "name": "Kazakhstan"}
     },
+    ...(serviceFaqs.value.length ? [{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": serviceFaqs.value.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
+    }] : []),
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -762,8 +1345,44 @@ const getServiceLink = (slug) => {
         </div>
       </section>
 
+      <!-- Решаемые задачи и инженерные решения (Problem-Solution Matrix) -->
+      <section v-if="serviceProblems.length" class="max-w-7xl mx-auto px-6 lg:px-12 mb-20">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="h-px w-8 bg-amber-500" />
+          <span class="text-amber-500 text-xs uppercase tracking-[0.2em] font-medium">{{ uiLabels.problems }}</span>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-8">
+          {{ uiLabels.problemsTitle }}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            v-for="(p, pIdx) in serviceProblems"
+            :key="pIdx"
+            class="p-6 border border-[#333842] bg-[#1A1D23]/70 rounded-xl hover:border-amber-500/40 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-medium mb-4">
+                <span>⚠️ {{ activeLang === 'kz' ? 'Нысандағы мәселе' : (activeLang === 'en' ? 'Field Problem' : 'Проблема на объекте') }}</span>
+              </div>
+              <h3 class="text-sm font-normal text-white mb-4 leading-relaxed">
+                {{ p.problem }}
+              </h3>
+              <div class="p-3.5 rounded-lg bg-[#252932]/70 border border-[#333842] text-xs text-[#D1D5DB] mb-4 leading-relaxed">
+                <span class="text-[#60A5FA] font-medium block mb-1">🛠️ {{ activeLang === 'kz' ? 'INPAR инженерлік шешімі' : (activeLang === 'en' ? 'INPAR Engineering Solution' : 'Инженерное решение INPAR') }}:</span>
+                {{ p.solution }}
+              </div>
+            </div>
+            <div class="pt-3 border-t border-[#333842]/50 text-xs text-emerald-400 font-medium flex items-start gap-2">
+              <span class="shrink-0">✅</span>
+              <span>{{ p.benefit }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Этапы работ -->
-      <section v-if="currentService.stagesRu && currentService.stagesRu.length" class="max-w-7xl mx-auto px-6 lg:px-12 mb-20">
+      <section v-if="serviceStages.length" class="max-w-7xl mx-auto px-6 lg:px-12 mb-20">
         <div class="flex items-center gap-4 mb-4">
           <div class="h-px w-8 bg-[#B8A276]" />
           <span class="text-[#B8A276] text-xs uppercase tracking-[0.2em]">{{ uiLabels.process }}</span>
@@ -774,7 +1393,7 @@ const getServiceLink = (slug) => {
 
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <div
-            v-for="(stage, idx) in currentService.stagesRu"
+            v-for="(stage, idx) in serviceStages"
             :key="idx"
             class="p-6 border border-[#333842] bg-gradient-to-b from-[#1E222A]/80 to-[#16181F]/80 rounded-xl relative"
           >
@@ -792,7 +1411,7 @@ const getServiceLink = (slug) => {
       </section>
 
       <!-- FAQ Section -->
-      <section v-if="currentService.faqsRu && currentService.faqsRu.length" class="max-w-4xl mx-auto px-6 lg:px-12 mb-20">
+      <section v-if="serviceFaqs.length" class="max-w-4xl mx-auto px-6 lg:px-12 mb-20">
         <div class="text-center mb-10">
           <span class="text-[#B8A276] text-xs uppercase tracking-[0.2em] block mb-2">FAQ</span>
           <h2 class="text-2xl md:text-3xl font-light tracking-tight text-white">
@@ -802,7 +1421,7 @@ const getServiceLink = (slug) => {
 
         <div class="space-y-3">
           <div
-            v-for="(faq, fIdx) in currentService.faqsRu"
+            v-for="(faq, fIdx) in serviceFaqs"
             :key="fIdx"
             class="border border-[#333842] rounded-xl overflow-hidden bg-[#1A1D23]/50 transition-colors"
           >

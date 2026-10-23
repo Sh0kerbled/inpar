@@ -113,7 +113,17 @@ export function updateSEO({
         "@type": "GeoCoordinates",
         "latitude": 43.233071,
         "longitude": 76.852412
-      }
+      },
+      "knowsAbout": [
+        {"@type": "DefinedTerm", "name": "Motor Control Center", "sameAs": "https://www.wikidata.org/wiki/Q175185"},
+        {"@type": "DefinedTerm", "name": "Direct digital control", "sameAs": "https://www.wikidata.org/wiki/Q5271878"},
+        {"@type": "DefinedTerm", "name": "Industrial control system", "sameAs": "https://www.wikidata.org/wiki/Q211050"},
+        {"@type": "DefinedTerm", "name": "Building management system", "sameAs": "https://www.wikidata.org/wiki/Q629239"},
+        {"@type": "DefinedTerm", "name": "KNX standard", "sameAs": "https://www.wikidata.org/wiki/Q1889"},
+        {"@type": "DefinedTerm", "name": "Electric switchboard", "sameAs": "https://www.wikidata.org/wiki/Q1141753"},
+        {"@type": "DefinedTerm", "name": "Extra-low voltage", "sameAs": "https://www.wikidata.org/wiki/Q1255858"},
+        {"@type": "DefinedTerm", "name": "Structured cabling", "sameAs": "https://www.wikidata.org/wiki/Q1363294"}
+      ]
     });
   }
 }

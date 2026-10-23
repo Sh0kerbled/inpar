@@ -302,12 +302,12 @@ const getProductWholesalePriceKzt = (product) => {
           <div
             class="h-full bg-linear-to-br from-[#1A1D23]/40 to-[#252932]/20 border border-[#333842] backdrop-blur-sm overflow-hidden rounded-2xl transition-all duration-500 ease-out hover:-translate-y-2 hover:scale-[1.015] hover:border-[#3B82F6]/50 hover:shadow-2xl hover:shadow-[#3B82F6]/10"
           >
-            <div class="aspect-square bg-[#1A1D23]/60 overflow-hidden relative">
+            <div class="aspect-square bg-white p-5 flex items-center justify-center overflow-hidden relative">
               <img
                 v-if="product.main_image"
                 :src="product.main_image"
                 :alt="product.name"
-                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                class="max-w-full max-h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105"
               />
               <div
                 v-else
@@ -315,10 +315,6 @@ const getProductWholesalePriceKzt = (product) => {
               >
                 <ShoppingCart class="w-12 h-12" />
               </div>
-
-              <div
-                class="absolute inset-0 bg-linear-to-t from-[#13151A]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              />
 
               <div
                 v-if="product.category_name && product.category_name !== 'Без категории'"
