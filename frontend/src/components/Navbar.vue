@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
+const { t, locale } = useI18n();
 
 const scrolled = ref(false);
 const menuOpen = ref(false);
@@ -11,6 +12,16 @@ const menuOpen = ref(false);
 const handleScroll = () => {
   scrolled.value = window.scrollY > 20;
 };
+
+const homeLink = computed(() => {
+  const lang = locale.value;
+  return lang === "ru" ? "/" : `/${lang}`;
+});
+
+const catalogLink = computed(() => {
+  const lang = locale.value;
+  return lang === "ru" ? "/products" : `/${lang}/products`;
+});
 
 const getLangLink = (lang) => {
   const cleanPath = route.path.replace(/^\/(kz|en)/, "") || "/";
@@ -47,7 +58,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
   >
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <router-link
-        to="/"
+        :to="homeLink"
         class="text-2xl font-light tracking-tight text-[#E8E9ED] hover:text-white transition-colors duration-200"
       >
         INPAR
@@ -64,7 +75,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
         </a>
 
         <router-link
-          to="/products"
+          :to="catalogLink"
           class="text-sm tracking-wide px-4 py-2 border border-[#333842] text-[#9BA1AB] hover:text-[#E8E9ED] hover:border-[#3B82F6]/50 transition-all duration-200"
         >
           {{ t("nav.catalog") }}
@@ -132,7 +143,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
       </a>
 
       <router-link
-        to="/products"
+        :to="catalogLink"
         class="text-sm tracking-wide text-[#9BA1AB] hover:text-[#E8E9ED] transition-colors duration-200"
         @click="menuOpen = false"
       >
